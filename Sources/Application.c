@@ -1,9 +1,5 @@
 #include "Application.h"
 
-#include <stdio.h>
-
-typedef char* string;
-
 int main (int argc, char **argv)
 {
     Vector *test = Vector_new ();
@@ -13,7 +9,10 @@ int main (int argc, char **argv)
     Vector_free_d (test, &Block_free);
     
     if (!init ())
+    {
+        throwError ("Required Allegro components failed to initialize.", -1);
         return -1;
+    }
     
     al_clear_to_color (al_map_rgb (0, 0, 0));
     al_flip_display ();

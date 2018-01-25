@@ -6,6 +6,7 @@
 #include <stdbool.h>
 
 #include "Block.h"
+#include "Utils.h"
 #include "Vector.h"
 
 static bool running = true;
