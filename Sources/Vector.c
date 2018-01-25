@@ -1,9 +1,29 @@
 #include "Vector.h"
 
+/**
+ * Returns whether or not the given Vector instance is empty.
+ * 
+ * @param vector The Vector instance to check
+ * 
+ * @return True if the given Vector instance is empty, false otherwise
+ */
 bool Vector_isEmpty (const Vector * const vector) { return vector->size == 0; }
 
+/**
+ * Returns whether or not the given Vector instance is full, and may need to be resized.
+ * 
+ * @param vector The Vector instance to check
+ * 
+ * @return True if the given Vector instance is full, false otherwise
+ */
 bool Vector_isFull (const Vector * const vector) { return vector->size >= vector->capacity; }
 
+/**
+ * Appends the given element to the end of the given Vector instance.
+ * 
+ * @param vector    The Vector instance to append the given element to
+ * @param element   The element to add to the given Vector instance
+ */
 void Vector_append (Vector * const vector, const void * const element)
 {
     if (Vector_isFull (vector))
