@@ -34,6 +34,15 @@ bool Vector_isEmpty (const Vector * const vector);
 bool Vector_isFull (const Vector * const vector);
 
 /**
+ * Returns the current number of elements within the given Vector instance.
+ * 
+ * @param vector The Vector instance to get the number of elements of
+ * 
+ * @return The number of elements within the given Vector instance
+ */
+unsigned int Vector_size (const Vector * const vector);
+
+/**
  * Appends the given element to the end of the given Vector instance, growing the Vector instance
  *  if needed.
  * 
@@ -45,6 +54,10 @@ void Vector_append (Vector * const vector, const void * const element);
 /**
  * Frees dynamically created objects (allocated using malloc, calloc, etc.) that are stored within 
  *  the given Vector instance.
+ * 
+ * NOTE: When freeing a Vector instance that contains other Vector instances, you must call this 
+ *          function on each sub-Vector instance with the appropriate free function, then you can
+ *          either call this function with a null function parameter or call Vector_free_s ().
  * 
  * @param vector    The Vector instance to free
  * @param f         The function to use to free each object stored within this Vector instance
