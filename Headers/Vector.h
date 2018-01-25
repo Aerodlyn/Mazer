@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include "Utils.h"
+
 struct _Vector
 {
     unsigned int capacity, size;
@@ -13,9 +15,11 @@ typedef struct _Vector Vector;
 
 typedef void (*Vector_freeFunction) (void*);
 
+bool Vector_isEmpty (const Vector * const vector);
+
 bool Vector_isFull (const Vector * const vector);
 
-void Vector_append (Vector *vector, void *element);
+void Vector_append (Vector * const vector, const void * const element);
 
 /**
  * Frees dynamically created objects (allocated using malloc, calloc, etc.) that are stored within 
@@ -36,9 +40,13 @@ void Vector_free_d (Vector *vector, Vector_freeFunction f);
  */
 void Vector_free_s (Vector *vector);
 
-void *Vector_get (Vector *vector, unsigned int index);
+void* Vector_get (const Vector * const vector, const unsigned int index);
 
-void Vector_resize (Vector * const vector, unsigned int size);
+void Vector_resize (Vector * const vector, const unsigned int size);
+
+void Vector_truncate_d (Vector * const vector, Vector_freeFunction f);
+
+void Vector_truncate_s (Vector * const vector);
 
 Vector *Vector_new ();
 
