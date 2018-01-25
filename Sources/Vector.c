@@ -19,7 +19,8 @@ bool Vector_isEmpty (const Vector * const vector) { return vector->size == 0; }
 bool Vector_isFull (const Vector * const vector) { return vector->size >= vector->capacity; }
 
 /**
- * Appends the given element to the end of the given Vector instance.
+ * Appends the given element to the end of the given Vector instance, growing the Vector instance
+ *  if needed.
  * 
  * @param vector    The Vector instance to append the given element to
  * @param element   The element to add to the given Vector instance
@@ -80,6 +81,59 @@ void* Vector_get (const Vector * const vector, const unsigned int index)
         throwError ("Cannot access elements outside of Vector instance's size.", -1);
 
     return vector->data [index];
+}
+
+/**
+ * Inserts the given element to the given Vector instance at the given index, growing the Vector
+ *  instance if needed.
+ * 
+ * @param vector    The Vector instance to insert the given element into
+ * @param element   The element to insert into the Vector instance
+ * @param index     The index of where the element should be inserted at
+ * 
+ * NOTE: Throws an error and terminates the program if the given index is out of the Vector
+ *          instance's range of elements.
+ */
+void Vector_insert (Vector * const vector, const void * const element, const unsigned int index)
+{
+    if (index >= vector->size)
+        throwError ("Cannot add elements outside of Vector instance's range.", -1);
+
+    if (Vector_isFull (vector))
+        Vector_resize (vector, vector->capacity * 2);
+
+    for (int i = vector->size; i > index; i--)
+        vector->data [i] = vector->data [i - 1];
+
+    vector->data [index] = element;
+    vector->size++;
+}
+
+/**
+ * Removes the element that is located within the given Vector instance at the given index and
+ *  frees it using the given function. Does nothing if the Vector instance is empty.
+ * 
+ * @param vector    The Vector instance that contains the element to remove and free
+ * @param index     The index of the element to remove and free
+ * @param f         The function to use to free the object stored within the given Vector
+ *                      instance at the given index; NOTE: Can be null, however no free call will 
+ *                      be made on the last object in the Vector instance.
+ */
+void Vector_remove (Vector * const vector, const unsigned int index, Vector_freeFunction f)
+{
+    if (index >= vector->size)
+        throwError ("Cannot remove an element that is outside of the Vector's instances range.", -1);
+
+    if (Vector_isEmpty (vector))
+        return;
+
+    if (f)
+        f (vector->data [index]);
+
+    for (unsigned int i = index; i < vector->size; i++)
+        vector->data [i] = vector->data [i + 1];
+
+    vector->size--;
 }
 
 /**

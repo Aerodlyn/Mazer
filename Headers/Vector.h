@@ -34,7 +34,8 @@ bool Vector_isEmpty (const Vector * const vector);
 bool Vector_isFull (const Vector * const vector);
 
 /**
- * Appends the given element to the end of the given Vector instance.
+ * Appends the given element to the end of the given Vector instance, growing the Vector instance
+ *  if needed.
  * 
  * @param vector    The Vector instance to append the given element to
  * @param element   The element to add to the given Vector instance
@@ -72,6 +73,31 @@ void Vector_free_s (Vector *vector);
  *          instance's range of elements.
  */
 void* Vector_get (const Vector * const vector, const unsigned int index);
+
+/**
+ * Inserts the given element to the given Vector instance at the given index, growing the Vector
+ *  instance if needed.
+ * 
+ * @param vector    The Vector instance to insert the given element into
+ * @param element   The element to insert into the Vector instance
+ * @param index     The index of where the element should be inserted at
+ * 
+ * NOTE: Throws an error and terminates the program if the given index is out of the Vector
+ *          instance's range of elements.
+ */
+void Vector_insert (Vector * const vector, const void * const element, const unsigned int index);
+
+/**
+ * Removes the element that is located within the given Vector instance at the given index and
+ *  frees it using the given function. Does nothing if the Vector instance is empty.
+ * 
+ * @param vector    The Vector instance that contains the element to remove and free
+ * @param index     The index of the element to remove and free
+ * @param f         The function to use to free the object stored within the given Vector
+ *                      instance at the given index; NOTE: Can be null, however no free call will 
+ *                      be made on the last object in the Vector instance.
+ */
+void Vector_remove (Vector * const vector, const unsigned int index, Vector_freeFunction f);
 
 /**
  * Resizes the given Vector instance such that its capacity is equal to the given size.
