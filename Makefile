@@ -4,12 +4,12 @@ OBJECTS := $(SOURCES:.c=.o)
 EXEC := Mazer
 CC := gcc
 
-CFLAGS := -std=c11 -Wall -IHeaders/
+CFLAGS := -std=c11 -fms-extensions -Wall -IHeaders/
 UNAME := $(shell uname)
 
 # The APACKS variable represents the name of the required Allegro packages (without the version id), 
 # with a '|' separating each as to be used with grep -E.
-APACKS := 'allegro-'
+APACKS := 'allegro-|allegro_primitives'
 
 # The ALIBS variable finds the Allegro packages that match the names given in the APACKS variable. 
 # The reason for this is because on two of my development systems the files have slightly different 
@@ -24,7 +24,7 @@ ALIBS := $(shell path=`echo $$PKG_CONFIG_PATH | awk -F ':' '{print $$2}'`; test 
 # ALIBS := $(shell ls /usr/local/lib/pkgconfig/ | grep -E $(APACKS) | awk -F '.pc' '{print $$1}')
 
 ifeq ($(UNAME), Darwin)
-	AFLAGS := -lallegro -lallegro_main
+	AFLAGS := -lallegro -lallegro_primitives -lallegro_main
 endif
 
 ifeq ($(UNAME), Linux)
