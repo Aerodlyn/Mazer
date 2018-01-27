@@ -34,7 +34,7 @@ unsigned int Vector_size (const Vector * const vector) { return vector->size; }
  * @param vector    The Vector instance to append the given element to
  * @param element   The element to add to the given Vector instance
  */
-void Vector_append (Vector * const vector, const void * const element)
+void Vector_append (Vector * const vector, void * const element)
 {
     if (Vector_isFull (vector))
         Vector_resize (vector, vector->capacity * 2);
@@ -107,9 +107,9 @@ void* Vector_get (const Vector * const vector, const unsigned int index)
  * NOTE: Throws an error and terminates the program if the given index is out of the Vector
  *          instance's range of elements.
  */
-void Vector_insert (Vector * const vector, const void * const element, const unsigned int index)
+void Vector_insert (Vector * const vector, void * const element, const unsigned int index)
 {
-    if (index >= vector->size)
+    if (index > vector->size)
         throwError ("Cannot add elements outside of Vector instance's range.", -1);
 
     if (Vector_isFull (vector))
@@ -162,6 +162,8 @@ void Vector_resize (Vector * const vector, const unsigned int size)
 {
     if (size < vector->size)
         throwError ("Cannot resize Vector instance to below its current size.", -1);
+
+    
 
     vector->capacity    = size;
     vector->data        = realloc (vector->data, vector->capacity);

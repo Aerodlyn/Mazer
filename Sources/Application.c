@@ -2,21 +2,16 @@
 
 int main (int argc, char **argv)
 {
-    Vector *test = Vector_new ();
-    Vector_append (test, Block_create (0, 0, al_map_rgb (0, 0, 0)));
-    Vector_append (test, Block_create (0, 0, al_map_rgb (0, 0, 0)));
-    Vector_append (test, Block_create (0, 0, al_map_rgb (0, 0, 0)));
-    Vector_free_d (test, &Block_free);
-    
     if (!init ())
     {
         throwError ("Required Allegro components failed to initialize.", -1);
         return -1;
     }
-    
-    al_clear_to_color (al_map_rgb (0, 0, 0));
-    al_flip_display ();
 
+    vector = Vector_create (Tile);
+    for (size_t i = 0; i < 50; i++)
+        Vector_push (vector, Tile_create (i * 5, i * 5, 5, al_map_rgb (i * 5, i * 5, i * 5)));
+    
     while (running)
     {
         input ();
@@ -64,6 +59,9 @@ void destroy ()
 
     if (eventQueue)
         al_destroy_event_queue (eventQueue);
+
+    if (vector)
+        Vector_destroy (vector);
 }
 
 void input () 
@@ -82,6 +80,17 @@ void input ()
 void render () 
 {
     al_clear_to_color (al_map_rgb (0, 0, 0));
+
+    for (size_t i = 0; i < Vector_size (vector); i++)
+    {
+        Tile *tile = Vector_at (vector, i);
+
+        unsigned int x = tile->getX (tile), y = tile->getY (tile), s = tile->getSize (tile);
+        ALLEGRO_COLOR c = tile->getColor (tile);
+
+        al_draw_filled_rectangle (x, y, x + s, y + s, c);
+    }
+
     al_flip_display ();
 }
 

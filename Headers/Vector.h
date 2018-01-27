@@ -49,7 +49,7 @@ unsigned int Vector_size (const Vector * const vector);
  * @param vector    The Vector instance to append the given element to
  * @param element   The element to add to the given Vector instance
  */
-void Vector_append (Vector * const vector, const void * const element);
+void Vector_append (Vector * const vector, void * const element);
 
 /**
  * Frees dynamically created objects (allocated using malloc, calloc, etc.) that are stored within 
@@ -98,7 +98,7 @@ void* Vector_get (const Vector * const vector, const unsigned int index);
  * NOTE: Throws an error and terminates the program if the given index is out of the Vector
  *          instance's range of elements.
  */
-void Vector_insert (Vector * const vector, const void * const element, const unsigned int index);
+void Vector_insert (Vector * const vector, void * const element, const unsigned int index);
 
 /**
  * Removes the element that is located within the given Vector instance at the given index and

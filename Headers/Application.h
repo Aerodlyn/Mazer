@@ -2,17 +2,23 @@
 #define MAZER_APPLICATION_H
 
 #include <allegro5/allegro.h>
+#include <allegro5/allegro_primitives.h>
 
 #include <stdbool.h>
+#include <stdio.h>
 
-#include "Block.h"
+#include "Tile.h"
 #include "Utils.h"
-#include "Vector.h"
+#include "_Vector.h"
 
 static bool running = true;
 
+static const unsigned int BLOCK_SIZE = 5;
+
 static ALLEGRO_DISPLAY      *display    = NULL;
 static ALLEGRO_EVENT_QUEUE  *eventQueue = NULL;
+
+static Vector (Tile) *vector;
 
 int main (int argc, char **argv);
 
