@@ -7,10 +7,6 @@ int main (int argc, char **argv)
         throwError ("Required Allegro components failed to initialize.", -1);
         return -1;
     }
-
-    vector = Vector_create (Tile);
-    for (size_t i = 0; i < 50; i++)
-        Vector_push (vector, Tile_create (i * 5, i * 5, 5, al_map_rgb (i * 5, i * 5, i * 5)));
     
     while (running)
     {
@@ -34,7 +30,7 @@ bool init ()
     if (!al_init ())
         return false;
 
-    display = al_create_display (640, 480);
+    display = al_create_display (640, 640);
 
     if (!display)
         return false;
@@ -49,6 +45,8 @@ bool init ()
 
     al_register_event_source (eventQueue, al_get_display_event_source (display));
 
+    generate ();
+
     return true;
 }
 
@@ -60,8 +58,42 @@ void destroy ()
     if (eventQueue)
         al_destroy_event_queue (eventQueue);
 
-    if (vector)
-        Vector_destroy (vector);
+    if (tiles)
+        Vector_destroy (tiles);
+}
+
+void generate ()
+{
+    int w = al_get_display_width (display);
+    tiles = Vector_create (Tile);
+
+    unsigned int tn = 250, tw = (w * 1.4142) / tn - 1;
+
+    for (size_t i = 0; i < tn; i++)
+    {
+        Tile tile;
+        Tile_init (&tile, i * tw, 0, (i + 1) * tw, al_map_rgb (i * 255 / tn, 0, 0));
+
+        Vector_push (tiles, tile);
+    }
+
+    for (size_t i = 0; i < tn; i++)
+    {
+        Tile tile;
+        Tile_init (&tile, 0, i * tw, (i + 1) * tw, al_map_rgb (0, 0, i * 255 / tn));
+
+        Vector_push (tiles, tile);
+    }
+
+    for (size_t i = 0; i < tn; i++)
+    {
+        Tile tile;
+        Tile_init (&tile, i * tw, i * tw, (i + 1) * tw, al_map_rgb (0, i * 255 / tn, 0));
+
+        Vector_push (tiles, tile);
+    }
+
+    printf ("Number of tiles generated: %lu\n", Vector_size (tiles));
 }
 
 void input () 
@@ -81,13 +113,13 @@ void render ()
 {
     al_clear_to_color (al_map_rgb (0, 0, 0));
 
-    for (size_t i = 0; i < Vector_size (vector); i++)
+    for (size_t i = 0; i < Vector_size (tiles); i++)
     {
-        Tile *tile = Vector_at (vector, i);
+        Tile *tile = Vector_at (tiles, i);
 
-        unsigned int x = tile->getX (tile), y = tile->getY (tile), s = tile->getSize (tile);
+        unsigned int x  = tile->getX (tile), y = tile->getY (tile), s = tile->getSize (tile);
         ALLEGRO_COLOR c = tile->getColor (tile);
-
+        
         al_draw_filled_rectangle (x, y, x + s, y + s, c);
     }
 

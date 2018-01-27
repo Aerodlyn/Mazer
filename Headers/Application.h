@@ -18,7 +18,7 @@ static const unsigned int BLOCK_SIZE = 5;
 static ALLEGRO_DISPLAY      *display    = NULL;
 static ALLEGRO_EVENT_QUEUE  *eventQueue = NULL;
 
-static Vector (Tile) *vector;
+static Vector (Tile) *tiles = NULL;
 
 int main (int argc, char **argv);
 
@@ -30,6 +30,8 @@ int main (int argc, char **argv);
 static bool init ();
 
 static void destroy ();
+
+static void generate ();
 
 static void input ();
 

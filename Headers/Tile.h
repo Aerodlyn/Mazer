@@ -21,6 +21,8 @@ typedef struct _Tile
     ALLEGRO_COLOR (*getColor) (struct _Tile*);
 } Tile;
 
-Tile* Tile_create (unsigned int x, unsigned int y, unsigned int size, ALLEGRO_COLOR color);
+void Tile_init (Tile *tile, unsigned int x, unsigned int y, unsigned int size, ALLEGRO_COLOR color);
+
+Tile *Tile_create (unsigned int x, unsigned int y, unsigned int size, ALLEGRO_COLOR color);
 
 #endif

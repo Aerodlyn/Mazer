@@ -13,6 +13,8 @@
 
 #define Vector_at(V, I) (&V->data [I])
 
+#define Vector_capacity(V) (V->capacity)
+
 #define Vector_create(T)                                                    \
 ({                                                                          \
     struct Vector_##T *v = malloc (sizeof (Vector (T)));                    \
@@ -32,6 +34,8 @@
     V = NULL;               \
 })
 
+#define Vector_pop(V) (V->data [--V->size])
+
 #define Vector_push(V, E)                                                           \
 ({                                                                                  \
     if (V->size >= V->capacity)                                                     \
@@ -40,7 +44,7 @@
         V->data = realloc (V->data, sizeof (*V->data) * V->capacity);               \
     }                                                                               \
                                                                                     \
-    V->data [V->size++] = *E;                                                       \
+    V->data [V->size++] = E;                                                        \
 })
 
 #define Vector_size(V) (V->size)
