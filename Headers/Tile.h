@@ -10,7 +10,7 @@ typedef struct _Tile
     unsigned int x, y;
     unsigned int size;
 
-    ALLEGRO_COLOR color;
+    ALLEGRO_COLOR borderColor, fillColor;
 
     unsigned int (*getSize) (struct _Tile*);
     unsigned int (*getX) (struct _Tile*);
@@ -18,11 +18,10 @@ typedef struct _Tile
 
     void (*destroy) (void*);
 
-    ALLEGRO_COLOR (*getColor) (struct _Tile*);
+    ALLEGRO_COLOR (*getBorderColor) (struct _Tile*);
+    ALLEGRO_COLOR (*getFillColor) (struct _Tile*);
 } Tile;
 
-void Tile_init (Tile *tile, unsigned int x, unsigned int y, unsigned int size, ALLEGRO_COLOR color);
-
-Tile *Tile_create (unsigned int x, unsigned int y, unsigned int size, ALLEGRO_COLOR color);
+void Tile_init (Tile *tile, unsigned int x, unsigned int y, unsigned int size, ALLEGRO_COLOR border, ALLEGRO_COLOR fill);
 
 #endif

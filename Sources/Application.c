@@ -23,14 +23,15 @@ int main (int argc, char **argv)
 /**
  * Attempts to inititalize required Allegro objects.
  *
- * @return Returns false if any Allegro object was unable to be created, true otherwise
+ * @return Returns false if any Allegro object was unable to be created, true 
+ *          otherwise
  */
 bool init ()
 {
     if (!al_init ())
         return false;
 
-    display = al_create_display (640, 640);
+    display = al_create_display (650, 650);
 
     if (!display)
         return false;
@@ -43,7 +44,8 @@ bool init ()
         return false;
     }
 
-    al_register_event_source (eventQueue, al_get_display_event_source (display));
+    al_register_event_source (eventQueue, 
+        al_get_display_event_source (display));
 
     generate ();
 
@@ -64,36 +66,73 @@ void destroy ()
 
 void generate ()
 {
-    int w = al_get_display_width (display);
+    srand (time (NULL));
+
     tiles = Vector_create (Tile);
 
-    unsigned int tn = 250, tw = (w * 1.4142) / tn - 1;
+    generateRooms ();
+}
 
-    for (size_t i = 0; i < tn; i++)
+void generateRooms ()
+{
+    Vector (Room) *rooms = Vector_create (Room);
+
+    for (uint8_t i = 0; i < ROOM_ATTEMPTS; i++)
     {
-        Tile tile;
-        Tile_init (&tile, i * tw, 0, (i + 1) * tw, al_map_rgb (i * 255 / tn, 0, 0));
+        uint16_t x = rand () % NUM_OF_TILES_PER_SIDE + 1, 
+            y = rand () % NUM_OF_TILES_PER_SIDE + 1;
+        uint16_t w = (rand () % MIN_ROOM_WIDTH_HEIGHT) + MIN_ROOM_WIDTH_HEIGHT,
+            h = (rand () % MIN_ROOM_WIDTH_HEIGHT) + MIN_ROOM_WIDTH_HEIGHT;
 
-        Vector_push (tiles, tile);
+        if (x + MIN_ROOM_WIDTH_HEIGHT > NUM_OF_TILES_PER_SIDE - 2)
+        {
+            x = NUM_OF_TILES_PER_SIDE - MIN_ROOM_WIDTH_HEIGHT - 2;
+            w = MIN_ROOM_WIDTH_HEIGHT;
+        }
+
+        if (y + MIN_ROOM_WIDTH_HEIGHT > NUM_OF_TILES_PER_SIDE - 2)
+        {
+            y = NUM_OF_TILES_PER_SIDE - MIN_ROOM_WIDTH_HEIGHT - 2;
+            h = MIN_ROOM_WIDTH_HEIGHT;
+        }
+
+        bool valid = true;
+        for (unsigned int j = 0; j < Vector_size (rooms) && valid; j++)
+        {
+            Room *room = Vector_at (rooms, j);
+
+            if (room->intersects (room, x, y, w, h))
+                valid = false;
+        }
+
+        if (valid)
+        {
+            Room room;
+            Room_init (&room, x, y, w, h);
+
+            Vector_push (rooms, room);
+
+            uint16_t xc = 0, yc = 0;
+            for (uint16_t j = 0; j < w * h; j++)
+            {
+                Tile tile;
+                Tile_init (&tile, x * getTileWidth () + xc * getTileWidth (), 
+                    y * getTileWidth () + yc * getTileWidth (), getTileWidth (),
+                    BLOCK_BORDER, BLOCK_FILL);
+
+                Vector_push (tiles, tile);
+
+                xc++;
+                if (xc >= w)
+                {
+                    xc = 0;
+                    yc++;
+                }
+            }
+        }
     }
 
-    for (size_t i = 0; i < tn; i++)
-    {
-        Tile tile;
-        Tile_init (&tile, 0, i * tw, (i + 1) * tw, al_map_rgb (0, 0, i * 255 / tn));
-
-        Vector_push (tiles, tile);
-    }
-
-    for (size_t i = 0; i < tn; i++)
-    {
-        Tile tile;
-        Tile_init (&tile, i * tw, i * tw, (i + 1) * tw, al_map_rgb (0, i * 255 / tn, 0));
-
-        Vector_push (tiles, tile);
-    }
-
-    printf ("Number of tiles generated: %lu\n", Vector_size (tiles));
+    Vector_destroy (rooms);
 }
 
 void input () 
@@ -111,16 +150,24 @@ void input ()
 
 void render () 
 {
+    int w = al_get_display_width (display);
+
     al_clear_to_color (al_map_rgb (0, 0, 0));
+    al_draw_filled_rectangle (0, 0, w, w, BLOCK_BORDER);
+    al_draw_filled_rectangle (getTileWidth (), getTileWidth (), 
+        w - getTileWidth (), w - getTileWidth (), al_map_rgb (0, 0, 0));
 
     for (size_t i = 0; i < Vector_size (tiles); i++)
     {
         Tile *tile = Vector_at (tiles, i);
 
-        unsigned int x  = tile->getX (tile), y = tile->getY (tile), s = tile->getSize (tile);
-        ALLEGRO_COLOR c = tile->getColor (tile);
+        unsigned int x  = tile->getX (tile), y = tile->getY (tile), 
+            s = tile->getSize (tile);
+        ALLEGRO_COLOR b = tile->getBorderColor (tile), 
+            f = tile->getFillColor (tile);
         
-        al_draw_filled_rectangle (x, y, x + s, y + s, c);
+        al_draw_filled_rectangle (x, y, x + s, y + s, f);
+        al_draw_rectangle (x, y, x + s, y + s, b, 1);
     }
 
     al_flip_display ();
@@ -129,4 +176,9 @@ void render ()
 void update () 
 {
 
+}
+
+static uint8_t getTileWidth ()
+{ 
+    return al_get_display_width (display) / NUM_OF_TILES_PER_SIDE;
 }
