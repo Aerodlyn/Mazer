@@ -26,6 +26,8 @@ subroutine generate_rooms (rooms, attempts, minSize, screenSize, padding) bind (
         rooms (i * 4_c_int + 4_c_int) = mod (rand (), minSize) + minSize
         
         do j = 1, i - 1
+            if (rooms (j * 4_c_int + 1_c_int) == -1) cycle
+            
             if (rooms (i * 4_c_int + 1_c_int) + rooms (i * 4_c_int + 3_c_int) < rooms (j * 4_c_int + 1_c_int)) then
                 add = .true.
             
