@@ -14,6 +14,8 @@
 #include "Utils.h"
 #include "_Vector.h"
 
+extern void generate_rooms (int*, int*, int*, int*, int*);
+
 static bool running = true;
 
 static const unsigned int BLOCK_SIZE = 5;
@@ -34,7 +36,7 @@ int main (int argc, char **argv);
 /**
  * Attempts to inititalize required Allegro objects.
  *
- * @return Returns false if any Allegro object was unable to be created, true 
+ * @return Returns false if any Allegro object was unable to be created, true
  *          otherwise
  */
 static bool init ();
@@ -53,4 +55,4 @@ static void update ();
 
 static uint8_t getTileWidth ();
 
-#endif 
+#endif
