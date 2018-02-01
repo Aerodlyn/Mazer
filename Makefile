@@ -1,5 +1,7 @@
 SOURCES := $(wildcard Sources/*.c)
-OBJECTS := $(SOURCES:.c=.o)
+FORTRAN := $(wildcard Sources/*.f)
+MODULES := $(wildcard *.mod)
+OBJECTS := $(SOURCES:.c=.o) $(FORTRAN:.f=.o)
 
 EXEC := Mazer
 CC := gcc
@@ -32,10 +34,15 @@ ifeq ($(UNAME), Linux)
 endif
 
 all : $(OBJECTS)
-	$(CC) -o $(EXEC) $(OBJECTS) $(CFLAGS) $(AFLAGS)
+	$(CC) -o $(EXEC) -lgfortran $(OBJECTS) $(CFLAGS) $(AFLAGS)
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) $(AFLAGS) -o $@ $<
+	
+%.o : %.f
+	gfortran -ffree-form -c $< -o $@
 
 clean:
 	rm $(OBJECTS)
+	rm $(MODULES)
+	rm Mazer
