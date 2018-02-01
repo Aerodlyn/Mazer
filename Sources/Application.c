@@ -77,14 +77,18 @@ void generateRooms ()
 {
     int attempts = 5, minSize = 10, padding = 1;
     int rooms [20];
-    
+
     generate_rooms (rooms, &attempts, &minSize, &NUM_OF_TILES_PER_SIDE, &padding);
-    
+
     for (int i = 0; i < attempts; i++)
     {
         int x = rooms [i * 4], y = rooms [i * 4 + 1];
         int w = rooms [i * 4 + 2], h = rooms [i * 4 + 3];
-        
+
+        // Don't add room if it overlaps another
+        if (x == -1)
+            continue;
+
         uint16_t xc = 0, yc = 0;
         for (uint16_t j = 0; j < w * h; j++)
         {
@@ -103,7 +107,7 @@ void generateRooms ()
             }
         }
     }
-    
+
     /*Vector (Room) *rooms = Vector_create (Room);
 
     for (uint8_t i = 0; i < ROOM_ATTEMPTS; i++)
