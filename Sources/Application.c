@@ -31,7 +31,7 @@ bool init ()
     if (!al_init ())
         return false;
 
-    display = al_create_display (650, 650);
+    display = al_create_display (450, 450);
 
     if (!display)
         return false;
@@ -75,8 +75,8 @@ void generate ()
 
 void generateRooms ()
 {
-    int attempts = 5, minSize = 10, padding = 1;
-    int rooms [20];
+    int attempts = 25, minSize = 5, padding = 1;
+    int rooms [attempts * 4];
 
     generate_rooms (rooms, &attempts, &minSize, &NUM_OF_TILES_PER_SIDE, &padding);
 
@@ -96,6 +96,8 @@ void generateRooms ()
             Tile_init (&tile, x * getTileWidth () + xc * getTileWidth (),
                 y * getTileWidth () + yc * getTileWidth (), getTileWidth (),
                 BLOCK_BORDER, BLOCK_FILL);
+
+            test_tile (&tile);
 
             Vector_push (tiles, tile);
 

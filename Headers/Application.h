@@ -15,6 +15,8 @@
 #include "_Vector.h"
 
 extern void generate_rooms (int*, int*, int*, int*, int*);
+extern void test_rooms (Room*);
+extern void test_tile (Tile*);
 
 static bool running = true;
 
