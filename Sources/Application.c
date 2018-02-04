@@ -31,7 +31,7 @@ bool init ()
     if (!al_init ())
         return false;
 
-    display = al_create_display (450, 450);
+    display = al_create_display (650, 650);
 
     if (!display)
         return false;
@@ -75,18 +75,16 @@ void generate ()
 
 void generateRooms ()
 {
-    int attempts = 25, minSize = 5, padding = 1;
-    int rooms [attempts * 4];
-
-    generate_rooms (rooms, &attempts, &minSize, &NUM_OF_TILES_PER_SIDE, &padding);
-
-    for (int i = 0; i < attempts; i++)
+    Room *rooms = calloc (ROOM_ATTEMPTS, sizeof (Room));
+    f_generateRooms (rooms, &ROOM_ATTEMPTS, &MIN_ROOM_WIDTH_HEIGHT, &NUM_OF_TILES_PER_SIDE, &WINDOW_PADDING);
+    
+    for (int i = 0; i < ROOM_ATTEMPTS; i++)
     {
-        int x = rooms [i * 4], y = rooms [i * 4 + 1];
-        int w = rooms [i * 4 + 2], h = rooms [i * 4 + 3];
+        int x = rooms [i].x, y = rooms [i].y;
+        int w = rooms [i].w, h = rooms [i].h;
 
         // Don't add room if it overlaps another
-        if (x == -1)
+        if (!rooms [i].valid)
             continue;
 
         uint16_t xc = 0, yc = 0;
@@ -96,8 +94,6 @@ void generateRooms ()
             Tile_init (&tile, x * getTileWidth () + xc * getTileWidth (),
                 y * getTileWidth () + yc * getTileWidth (), getTileWidth (),
                 BLOCK_BORDER, BLOCK_FILL);
-
-            test_tile (&tile);
 
             Vector_push (tiles, tile);
 
@@ -110,64 +106,7 @@ void generateRooms ()
         }
     }
 
-    /*Vector (Room) *rooms = Vector_create (Room);
-
-    for (uint8_t i = 0; i < ROOM_ATTEMPTS; i++)
-    {
-        uint16_t x = rand () % NUM_OF_TILES_PER_SIDE + 1,
-            y = rand () % NUM_OF_TILES_PER_SIDE + 1;
-        uint16_t w = (rand () % MIN_ROOM_WIDTH_HEIGHT) + MIN_ROOM_WIDTH_HEIGHT,
-            h = (rand () % MIN_ROOM_WIDTH_HEIGHT) + MIN_ROOM_WIDTH_HEIGHT;
-
-        if (x + MIN_ROOM_WIDTH_HEIGHT > NUM_OF_TILES_PER_SIDE - 2)
-        {
-            x = NUM_OF_TILES_PER_SIDE - MIN_ROOM_WIDTH_HEIGHT - 2;
-            w = MIN_ROOM_WIDTH_HEIGHT;
-        }
-
-        if (y + MIN_ROOM_WIDTH_HEIGHT > NUM_OF_TILES_PER_SIDE - 2)
-        {
-            y = NUM_OF_TILES_PER_SIDE - MIN_ROOM_WIDTH_HEIGHT - 2;
-            h = MIN_ROOM_WIDTH_HEIGHT;
-        }
-
-        bool valid = true;
-        for (unsigned int j = 0; j < Vector_size (rooms) && valid; j++)
-        {
-            Room *room = Vector_at (rooms, j);
-
-            if (room->intersects (room, x, y, w, h))
-                valid = false;
-        }
-
-        if (valid)
-        {
-            Room room;
-            Room_init (&room, x, y, w, h);
-
-            Vector_push (rooms, room);
-
-            uint16_t xc = 0, yc = 0;
-            for (uint16_t j = 0; j < w * h; j++)
-            {
-                Tile tile;
-                Tile_init (&tile, x * getTileWidth () + xc * getTileWidth (),
-                    y * getTileWidth () + yc * getTileWidth (), getTileWidth (),
-                    BLOCK_BORDER, BLOCK_FILL);
-
-                Vector_push (tiles, tile);
-
-                xc++;
-                if (xc >= w)
-                {
-                    xc = 0;
-                    yc++;
-                }
-            }
-        }
-    }
-
-    Vector_destroy (rooms);*/
+    free (rooms);
 }
 
 void input ()

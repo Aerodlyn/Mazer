@@ -1,7 +1,7 @@
 #include "Room.h"
 
-static bool intersects (const Room * const room, const uint16_t x, 
-    const uint16_t y, const uint16_t w, const uint16_t h) 
+static bool intersects (const Room * const room, const int16_t x, 
+    const int16_t y, const int16_t w, const int16_t h) 
 {
     if (room->x + room->w < x || x + w < room->x)
         return false;
@@ -12,8 +12,8 @@ static bool intersects (const Room * const room, const uint16_t x,
     return true;
 }
 
-void Room_init (Room * const room, const uint16_t x, const uint16_t y, 
-    const uint16_t w, const uint16_t h)
+void Room_init (Room * const room, const int16_t x, const int16_t y, 
+    const int16_t w, const int16_t h)
 {
     room->x = x;
     room->y = y;

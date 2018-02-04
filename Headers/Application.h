@@ -14,16 +14,12 @@
 #include "Utils.h"
 #include "_Vector.h"
 
-extern void generate_rooms (int*, int*, int*, int*, int*);
-extern void test_rooms (Room*);
-extern void test_tile (Tile*);
+extern void f_generateRooms (Room*, const int16_t*, const int16_t*, const int16_t*, const int8_t*);
 
 static bool running = true;
 
-static const unsigned int BLOCK_SIZE = 5;
-
-static const uint8_t ROOM_ATTEMPTS = 50;
-static const uint16_t MIN_ROOM_WIDTH_HEIGHT = 5, NUM_OF_TILES_PER_SIDE = 50;
+static const int8_t WINDOW_PADDING = 1;
+static const int16_t MIN_ROOM_WIDTH_HEIGHT = 5, ROOM_ATTEMPTS = 1000, NUM_OF_TILES_PER_SIDE = 50;
 
 static ALLEGRO_DISPLAY      *display    = NULL;
 static ALLEGRO_EVENT_QUEUE  *eventQueue = NULL;
