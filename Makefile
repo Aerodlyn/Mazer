@@ -1,6 +1,6 @@
 SOURCES := $(wildcard Sources/*.c)
-FORTRAN := $(wildcard Sources/*.f95)
-MODULES := $(wildcard *.mod)
+FORTRAN := Sources/Mazer_Module.f95 Sources/Generate_Rooms.f95
+MODULES := $(wildcard *.mod Sources/*.mod)
 OBJECTS := $(SOURCES:.c=.o) $(FORTRAN:.f95=.o)
 
 EXEC := Mazer
@@ -22,8 +22,8 @@ APACKS := 'allegro-|allegro_primitives'
 # contains more than one path and the one where Allegro's .pc files are located isn't the first
 # one in the list, you can comment out the below command and uncomment the one below it. Set
 # the path to where Allegro's .pc files are located.
-# ALIBS := $(shell path=`echo $$PKG_CONFIG_PATH | awk -F ':' '{print $$2}'`; test "$$path" == '' && path=$$PKG_CONFIG_PATH; ls $$path | grep -E $(APACKS) | awk -F '.pc' '{print $$1}')
-ALIBS := $(shell ls /usr/lib/pkgconfig/ | grep -E $(APACKS) | awk -F '.pc' '{print $$1}')
+ALIBS := $(shell path=`echo $$PKG_CONFIG_PATH | awk -F ':' '{print $$2}'`; test "$$path" == '' && path=$$PKG_CONFIG_PATH; ls $$path | grep -E $(APACKS) | awk -F '.pc' '{print $$1}')
+# ALIBS := $(shell ls /usr/lib/pkgconfig/ | grep -E $(APACKS) | awk -F '.pc' '{print $$1}')
 
 ifeq ($(UNAME), Darwin)
 	AFLAGS := -lallegro -lallegro_primitives -lallegro_main
