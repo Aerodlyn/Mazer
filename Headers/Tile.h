@@ -3,25 +3,28 @@
 
 #include <allegro5/allegro.h>
 
+#include <stdbool.h>
 #include <stdlib.h>
 
 typedef struct _Tile
 {
-    unsigned int x, y;
-    unsigned int size;
+    bool valid;
+
+    int16_t x, y, size;
 
     ALLEGRO_COLOR borderColor, fillColor;
 
-    unsigned int (*getSize) (struct _Tile*);
-    unsigned int (*getX) (struct _Tile*);
-    unsigned int (*getY) (struct _Tile*);
+    int16_t (*getSize) (struct _Tile*);
+    int16_t (*getX) (struct _Tile*);
+    int16_t (*getY) (struct _Tile*);
 
-    void (*destroy) (void*);
+    void (*destroy) (struct _Tile*);
 
     ALLEGRO_COLOR (*getBorderColor) (struct _Tile*);
     ALLEGRO_COLOR (*getFillColor) (struct _Tile*);
 } Tile;
 
-void Tile_init (Tile *tile, unsigned int x, unsigned int y, unsigned int size, ALLEGRO_COLOR border, ALLEGRO_COLOR fill);
+void Tile_init (Tile *tile, int16_t x, int16_t y, int16_t size, ALLEGRO_COLOR border, 
+    ALLEGRO_COLOR fill);
 
 #endif

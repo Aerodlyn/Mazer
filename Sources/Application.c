@@ -61,22 +61,24 @@ void destroy ()
         al_destroy_event_queue (eventQueue);
 
     if (tiles)
-        Vector_destroy (tiles);
+        free (tiles);
 }
 
 void generate ()
 {
     srand (time (NULL));
 
-    tiles = Vector_create (Tile);
+    tiles = calloc (NUM_OF_TILES_PER_SIDE * NUM_OF_TILES_PER_SIDE, sizeof (Tile));
 
     generateRooms ();
+    f_generatePaths (tiles, &NUM_OF_TILES_PER_SIDE, &ROOM_ATTEMPTS);
 }
 
 void generateRooms ()
 {
     Room *rooms = calloc (ROOM_ATTEMPTS, sizeof (Room));
-    f_generateRooms (rooms, &ROOM_ATTEMPTS, &MIN_ROOM_WIDTH_HEIGHT, &NUM_OF_TILES_PER_SIDE, &WINDOW_PADDING);
+    f_generateRooms (rooms, &ROOM_ATTEMPTS, &MIN_ROOM_WIDTH_HEIGHT, &NUM_OF_TILES_PER_SIDE, 
+        &WINDOW_PADDING);
     
     for (int i = 0; i < ROOM_ATTEMPTS; i++)
     {
@@ -91,11 +93,9 @@ void generateRooms ()
         for (uint16_t j = 0; j < w * h; j++)
         {
             Tile tile;
-            Tile_init (&tile, x * getTileWidth () + xc * getTileWidth (),
-                y * getTileWidth () + yc * getTileWidth (), getTileWidth (),
-                BLOCK_BORDER, BLOCK_FILL);
+            Tile_init (&tile, x + xc, y + yc, 1, BLOCK_BORDER, BLOCK_FILL);
 
-            Vector_push (tiles, tile);
+            tiles [(x + xc - 1) + NUM_OF_TILES_PER_SIDE * (y + yc - 1)] = tile;
 
             xc++;
             if (xc >= w)
@@ -131,14 +131,22 @@ void render ()
     al_draw_filled_rectangle (getTileWidth (), getTileWidth (),
         w - getTileWidth (), w - getTileWidth (), al_map_rgb (0, 0, 0));
 
-    for (size_t i = 0; i < Vector_size (tiles); i++)
+    for (int16_t i = 0; i < NUM_OF_TILES_PER_SIDE * NUM_OF_TILES_PER_SIDE; i++)
     {
-        Tile *tile = Vector_at (tiles, i);
+        Tile tile = tiles [i];
 
-        unsigned int x  = tile->getX (tile), y = tile->getY (tile),
-            s = tile->getSize (tile);
-        ALLEGRO_COLOR b = tile->getBorderColor (tile),
-            f = tile->getFillColor (tile);
+        if (!tile.valid)
+            continue;
+
+        //int16_t x = tile.getX (&tile), y = tile.getY (&tile), s = tile.getSize (&tile);
+        //ALLEGRO_COLOR b = tile.getBorderColor (&tile), f = tile.getFillColor (&tile);
+
+        int16_t x = tile.x, y = tile.y, s = tile.size;
+        ALLEGRO_COLOR b = tile.borderColor, f = tile.fillColor;
+
+        x *= getTileWidth ();
+        y *= getTileWidth ();
+        s *= getTileWidth ();
 
         al_draw_filled_rectangle (x, y, x + s, y + s, f);
         al_draw_rectangle (x, y, x + s, y + s, b, 1);
