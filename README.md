@@ -8,6 +8,6 @@ To compile Mazer, you will need GCC (which includes gfortran), Make, and Allegro
 Please report any errors that you get. If you receive errors from pkg-config, you may need to point `PKG_CONFIG_PATH` to where Allegro installed its pkg-config files to (e.g. allegro-5*.pc).
 
 ## Note
-Mazer seems to compile just fine on my two Linux machines, but has issues on my OSX machine. Initially gcc would complain about unused linker options, and if you recompiled it wouldn't. But, occasionally upon running the game, the system would experience a kernel panic. I currently have no idea whether or not this issue is simply my computer, Allegro, or my programming is at fault (which I doubt would cause the entire system to shut down).
+Mazer seems to compile just fine on my two Linux machines, but has issues on my OSX machine. Initially gcc would complain about unused linker options, and if you recompiled it wouldn't. But, occasionally upon running the game, the system would experience a kernel panic. I currently have no idea whether or not this issue is simply my computer, Allegro, or my programming (which I doubt would cause the entire system to shut down).
 
-So if you are going to compile Mazer on OSX, be warned that bad things may happen so I wouldn't run the program if you have other applications open.
+So if you are going to compile Mazer on OSX, be warned that bad things may happen so I wouldn't run the program if you have other applications open. I have not tested compiling / running Mazer on Windows.
