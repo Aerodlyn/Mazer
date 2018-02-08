@@ -25,7 +25,7 @@ module Mazer
             implicit none
         end function rand
 
-        type (ALLEGRO_COLOR) function al_map_rgb_f (r, g, b) bind (C, name = "al_map_rgb")
+        type (ALLEGRO_COLOR) function al_map_rgb_f (r, g, b) bind (C, name = "al_map_rgb_f")
             use, intrinsic :: iso_c_binding
             import
             implicit none
