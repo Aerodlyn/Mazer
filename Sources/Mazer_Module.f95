@@ -1,7 +1,7 @@
 module Mazer
     use, intrinsic :: iso_c_binding
     type, bind (C) :: ALLEGRO_COLOR
-        character (c_float) :: r, g, b, a
+        real (c_float) :: r, g, b, a
     end type
 
     type, bind (C) :: Room
@@ -25,12 +25,20 @@ module Mazer
             implicit none
         end function rand
 
+        type (ALLEGRO_COLOR) function al_map_rgb (r, g, b) bind (C, name = "al_map_rgb")
+            use, intrinsic :: iso_c_binding
+            import
+            implicit none
+        
+            integer (c_signed_char) :: r, g, b
+        end function al_map_rgb
+
         type (ALLEGRO_COLOR) function al_map_rgb_f (r, g, b) bind (C, name = "al_map_rgb_f")
             use, intrinsic :: iso_c_binding
             import
             implicit none
         
-            real (c_float) :: r, g, b
+            real (kind = 4) :: r, g, b
         end function al_map_rgb_f
     end interface
 end module Mazer

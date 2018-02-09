@@ -31,7 +31,7 @@ bool init ()
     if (!al_init ())
         return false;
 
-    display = al_create_display (650, 650);
+    display = al_create_display (450, 450);
 
     if (!display)
         return false;
@@ -70,8 +70,10 @@ void generate ()
 
     tiles = calloc (NUM_OF_TILES_PER_SIDE * NUM_OF_TILES_PER_SIDE, sizeof (Tile));
 
+    int16_t tileAttempts = NUM_OF_TILES_PER_SIDE * 3;
+
     generateRooms ();
-    f_generatePaths (tiles, &NUM_OF_TILES_PER_SIDE, &ROOM_ATTEMPTS);
+    f_generatePaths (tiles, &NUM_OF_TILES_PER_SIDE, &tileAttempts, &WINDOW_PADDING);
 }
 
 void generateRooms ()
@@ -142,14 +144,14 @@ void render ()
         //ALLEGRO_COLOR b = tile.getBorderColor (&tile), f = tile.getFillColor (&tile);
 
         int16_t x = tile.x, y = tile.y, s = tile.size;
-        ALLEGRO_COLOR b = tile.borderColor, f = tile.fillColor;
+        //ALLEGRO_COLOR b = tile.borderColor, f = tile.fillColor;
 
         x *= getTileWidth ();
         y *= getTileWidth ();
         s *= getTileWidth ();
 
-        al_draw_filled_rectangle (x, y, x + s, y + s, f);
-        al_draw_rectangle (x, y, x + s, y + s, b, 1);
+        al_draw_filled_rectangle (x, y, x + s, y + s, al_map_rgb (255, 0, 0));
+        al_draw_rectangle (x, y, x + s, y + s, al_map_rgb (255, 255, 255), 1);
     }
 
     al_flip_display ();
