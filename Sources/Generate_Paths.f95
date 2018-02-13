@@ -1,3 +1,5 @@
+! Try picking a tile that has one or more empty neighbors, and move mostly in a straight line
+!   until you hit another tile.
 subroutine f_generatePaths (tiles, perSide, attempts, padding) bind (C, name = "f_generatePaths")
     use, intrinsic :: iso_c_binding
     use Mazer
@@ -24,12 +26,14 @@ subroutine f_generatePaths (tiles, perSide, attempts, padding) bind (C, name = "
             !tiles ((x + perSide * y) + 1)%border = al_map_rgb_f (1.0, 0.0, 0.0)
             !tiles ((x + perSide * y) + 1)%fill = al_map_rgb (255_c_signed_char, 0_c_signed_char, 0_c_signed_char)
             tiles ((x + perSide * y) + 1)%valid = .true.
-            
+
             dir = mod (rand (), 4_c_int)
             do while (dir == odir)
                 dir = mod (rand (), 4_c_int)
             end do
-            
+
+            odir = mod (dir + 2_c_int, 4_c_int)
+
             select case (dir)
                 case (0)
                     x = x + 1_c_int16_t
@@ -44,8 +48,6 @@ subroutine f_generatePaths (tiles, perSide, attempts, padding) bind (C, name = "
                     y = y - 1_c_int16_t
                     if (y < padding) y = y + 1_c_int16_t
             end select
-
-            odir = dir
         end do
     end do
 end subroutine f_generatePaths
