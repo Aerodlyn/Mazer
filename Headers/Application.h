@@ -14,7 +14,7 @@
 #include "Utils.h"
 #include "_Vector.h"
 
-extern void f_generatePaths (Tile*, const int16_t*, const int16_t*, const int16_t*);
+extern void f_generatePaths (Tile*, const int16_t*, const int16_t*, const int8_t*);
 extern void f_generateRooms (Room*, const int16_t*, const int16_t*, const int16_t*, const int8_t*);
 
 static bool running = true;

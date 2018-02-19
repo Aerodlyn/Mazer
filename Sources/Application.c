@@ -70,7 +70,7 @@ void generate ()
 
     tiles = calloc (NUM_OF_TILES_PER_SIDE * NUM_OF_TILES_PER_SIDE, sizeof (Tile));
 
-    int16_t tileAttempts = NUM_OF_TILES_PER_SIDE * 3;
+    int16_t tileAttempts = ROOM_ATTEMPTS;
 
     generateRooms ();
     f_generatePaths (tiles, &NUM_OF_TILES_PER_SIDE, &tileAttempts, &WINDOW_PADDING);

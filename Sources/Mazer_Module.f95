@@ -40,6 +40,38 @@ module Mazer
         
             real (kind = 4) :: r, g, b
         end function al_map_rgb_f
+
+        logical function f_validStarter (tiles, x, y, perSide, padding)
+            use, intrinsic :: iso_c_binding
+            use Mazer
+            implicit none
+            
+            integer (c_int16_t), intent (in) :: x, y, perSide
+            integer (c_int8_t), intent (in) :: padding
+            type (Tile), dimension (perSide * perSide), intent (in) :: tiles
+            
+            f_validStarter = .false.
+            if (.not. tiles ((x + perSide * y) + 1_c_int16_t)%valid) then
+                f_validStarter = .false.
+            
+            else
+                if (x > padding + 1_c_int8_t) then
+                    if (.not. tiles (((x - 1_c_int16_t) + perSide * y) + 1_c_int16_t)%valid) f_validStarter = .true.
+                end if
+            
+                if (x < perSide - padding - 1_c_int8_t) then
+                    if (.not. tiles (((x + 1_c_int16_t) + perSide * y) + 1_c_int16_t)%valid) f_validStarter = .true.
+                end if
+            
+                if (y > padding + 1_c_int8_t) then
+                    if (.not. tiles ((x + perSide * (y - 1_c_int16_t)) + 1_c_int16_t)%valid) f_validStarter = .true.
+                end if
+            
+                if (y < perSide - padding - 1_c_int8_t) then
+                    if (.not. tiles ((x + perSide * (x + 1_c_int16_t)) + 1_c_int16_t)%valid) f_validStarter = .true.
+                end if
+            end if 
+        end function f_validStarter
     end interface
 end module Mazer
 
