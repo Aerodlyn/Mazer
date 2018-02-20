@@ -144,14 +144,14 @@ void render ()
         //ALLEGRO_COLOR b = tile.getBorderColor (&tile), f = tile.getFillColor (&tile);
 
         int16_t x = tile.x, y = tile.y, s = tile.size;
-        //ALLEGRO_COLOR b = tile.borderColor, f = tile.fillColor;
+        ALLEGRO_COLOR b = tile.borderColor, f = tile.fillColor;
 
         x *= getTileWidth ();
         y *= getTileWidth ();
         s *= getTileWidth ();
 
-        al_draw_filled_rectangle (x, y, x + s, y + s, al_map_rgb (255, 0, 0));
-        al_draw_rectangle (x, y, x + s, y + s, al_map_rgb (255, 255, 255), 1);
+        al_draw_filled_rectangle (x, y, x + s, y + s, f /*al_map_rgb_f (1.0f, 0.0f, 0.0f)*/);
+        al_draw_rectangle (x, y, x + s, y + s, b /*al_map_rgb (255, 255, 255)*/, 1);
     }
 
     al_flip_display ();
