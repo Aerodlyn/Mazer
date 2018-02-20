@@ -11,10 +11,10 @@ subroutine f_generateRooms (rooms, attempts, minSize, mazeSize, padding) &
     integer (c_int16_t) :: i, j, x, y, w, h
     logical (c_bool) :: add = .true.
     do i = 1, attempts
-        x = mod (rand (), mazeSize)
-        y = mod (rand (), mazeSize)
-        w = mod (rand (), minSize) + minSize
-        h = mod (rand (), minSize) + minSize
+        x = mod (c_rand (), mazeSize)
+        y = mod (c_rand (), mazeSize)
+        w = mod (c_rand (), minSize) + minSize
+        h = mod (c_rand (), minSize) + minSize
 
         if (x < padding) x = padding
         if (y < padding) y = padding
