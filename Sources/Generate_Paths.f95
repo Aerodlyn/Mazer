@@ -42,7 +42,8 @@ subroutine f_generatePaths (tiles, perSide, attempts, padding) bind (C, name = "
     integer (c_int8_t), intent (in) :: padding
     type (Tile), dimension (perSide * perSide), intent (inout) :: tiles
 
-    integer (c_int16_t) :: i, x, y
+    integer (c_int16_t) :: i, x, y, w = 1_c_int16_t, h = 1_c_int16_t
+    type (Tile) :: t
     do i = 1, attempts
         x = mod (c_rand (), perSide)
         y = mod (c_rand (), perSide)
@@ -52,52 +53,14 @@ subroutine f_generatePaths (tiles, perSide, attempts, padding) bind (C, name = "
         if (x > perSide - padding - 1) x = perSide - padding - 1_c_int16_t
         if (y > perSide - padding - 1) y = perSide - padding - 1_c_int16_t
 
-        if (f_validStarter (tiles, x, y, perSide, padding)) then
-            tiles ((x + perSide * y) + 1_c_int16_t)%fill = al_map_rgb_f (0.0_c_float, 0.0_c_float, 1.0_c_float)
-            tiles ((x + perSide * y) + 1_c_int16_t)%border = al_map_rgb_f (1.0_c_float, 1.0_c_float, 1.0_c_float)
+        if (.true.) then
+            t = tiles ((x + perSide * y) + 1_c_int8_t)
+
+            call c_Tile_init (t, x, y, w, h)
+            !call c_mapRGB (t%fill, 0.5_c_float, 1.0_c_float, 1.0_c_float)
+            !call c_mapRGB (t%border, 1.0_c_float, 1.0_c_float, 1.0_c_float)
+
+            tiles ((x + perSide * y) + 1_c_int8_t) = t
         end if
     end do
-
-    !integer (c_int) :: dir, odir
-    !integer (c_int16_t) :: i, x, y
-    !do i = 1, attempts
-        !x = mod (c_rand (), perSide)
-        !y = mod (c_rand (), perSide)
-
-        !if (x < padding) x = padding
-        !if (y < padding) y = padding
-        !if (x > perSide - padding - 1) x = perSide - padding - 1_c_int16_t
-        !if (y > perSide - padding - 1) y = perSide - padding - 1_c_int16_t
-
-        !do while (.not. tiles ((x + perSide * y) + 1)%valid)
-            !tiles ((x + perSide * y) + 1)%x = x
-            !tiles ((x + perSide * y) + 1)%y = y
-            !tiles ((x + perSide * y) + 1)%s = 1
-            !tiles ((x + perSide * y) + 1)%border = al_map_rgb_f (1.0_c_float, 1.0_c_float, 1.0_c_float)
-            !tiles ((x + perSide * y) + 1)%fill = al_map_rgb_f (0.0_c_float, 0.0_c_float, 1.0_c_float)
-            !tiles ((x + perSide * y) + 1)%valid = .true.
-
-            !dir = mod (c_rand (), 4_c_int)
-            !do while (dir == odir)
-                !dir = mod (c_rand (), 4_c_int)
-            !end do
-
-            !odir = mod (dir + 2_c_int, 4_c_int)
-
-            !select case (dir)
-                !case (0)
-                    !x = x + 1_c_int16_t
-                    !if (x > perSide - padding - 1) x = x - 1_c_int16_t
-                !case (1)
-                    !y = y + 1_c_int16_t
-                    !if (y > perSide - padding - 1) y = y - 1_c_int16_t
-                !case (2)
-                    !x = x - 1_c_int16_t
-                    !if (x < padding) x = x + 1_c_int16_t
-                !case (3)
-                    !y = y - 1_c_int16_t
-                    !if (y < padding) y = y + 1_c_int16_t
-            !end select
-        !end do
-    !end do
 end subroutine f_generatePaths

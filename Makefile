@@ -4,10 +4,10 @@ MODULES := $(wildcard *.mod Sources/*.mod)
 OBJECTS := $(SOURCES:.c=.o) $(FORTRAN:.f95=.o)
 
 EXEC := Mazer
-CC := gcc
+CC   := gcc-7
 
-CFLAGS := -std=c11 -fms-extensions -Wall -IHeaders/
-UNAME := $(shell uname)
+CFLAGS    := -std=c11 -fms-extensions -Wall -g -IHeaders/
+SDL_FLAGS := `sdl2-config --cflags --libs`
 
 # The APACKS variable represents the name of the required Allegro packages (without the version id), 
 # with a '|' separating each as to be used with grep -E.
@@ -25,19 +25,11 @@ APACKS := 'allegro-|allegro_primitives'
 ALIBS := $(shell path=`echo $$PKG_CONFIG_PATH | awk -F ':' '{print $$2}'`; test "$$path" == '' && path=$$PKG_CONFIG_PATH; ls $$path | grep -E $(APACKS) | awk -F '.pc' '{print $$1}')
 # ALIBS := $(shell ls /usr/lib/pkgconfig/ | grep -E $(APACKS) | awk -F '.pc' '{print $$1}')
 
-ifeq ($(UNAME), Darwin)
-	AFLAGS := -lallegro -lallegro_primitives -lallegro_main
-endif
-
-ifeq ($(UNAME), Linux)
-	AFLAGS := `pkg-config --cflags --libs $(ALIBS)`
-endif
-
 all : $(OBJECTS)
-	$(CC) -o $(EXEC) -lgfortran $(OBJECTS) $(CFLAGS) $(AFLAGS)
+	$(CC) -lgfortran $(CFLAGS) $(SDL_FLAGS) -o $(EXEC) $(OBJECTS)
 
 %.o : %.c
-	$(CC) -c $(CFLAGS) $(AFLAGS) -o $@ $<
+	$(CC) -c $(CFLAGS) $(SDL_FLAGS) -o $@ $<
 	
 %.o : %.f95
 	gfortran -ffree-form -c $< -o $@

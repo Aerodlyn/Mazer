@@ -2,63 +2,26 @@
 
 int main (int argc, char **argv)
 {
-    if (!init ())
-    {
-        throwError ("Required Allegro components failed to initialize.", -1);
-        return -1;
-    }
-
-    while (running)
+    applicationStatus = init ();
+    while (applicationStatus == RUNNING) 
     {
         input ();
-        update ();
         render ();
     }
 
     destroy ();
-
-    return 0;
-}
-
-/**
- * Attempts to inititalize required Allegro objects.
- *
- * @return Returns false if any Allegro object was unable to be created, true
- *          otherwise
- */
-bool init ()
-{
-    if (!al_init ())
-        return false;
-
-    display = al_create_display (450, 450);
-
-    if (!display)
-        return false;
-
-    eventQueue = al_create_event_queue ();
-
-    if (!eventQueue)
-    {
-        destroy ();
-        return false;
-    }
-
-    al_register_event_source (eventQueue,
-        al_get_display_event_source (display));
-
-    generate ();
-
-    return true;
+    return applicationStatus;
 }
 
 void destroy ()
 {
-    if (display)
-        al_destroy_display (display);
+    if (renderer)
+        SDL_DestroyRenderer (renderer);
 
-    if (eventQueue)
-        al_destroy_event_queue (eventQueue);
+    if (window)
+        SDL_DestroyWindow (window);
+
+    SDL_Quit ();
 
     if (tiles)
         free (tiles);
@@ -69,11 +32,21 @@ void generate ()
     srand (time (NULL));
 
     tiles = calloc (NUM_OF_TILES_PER_SIDE * NUM_OF_TILES_PER_SIDE, sizeof (Tile));
-
     int16_t tileAttempts = ROOM_ATTEMPTS;
 
     generateRooms ();
     f_generatePaths (tiles, &NUM_OF_TILES_PER_SIDE, &tileAttempts, &WINDOW_PADDING);
+
+    /*for (int16_t i = 0; i < NUM_OF_TILES_PER_SIDE * NUM_OF_TILES_PER_SIDE; i++)
+    {
+        Tile t = tiles [i];
+
+        if (!t.valid)
+            continue;
+
+        if (t.fillColor [0] != 255)
+            printf ("%d, %d, %d, %d\n", t.fillColor [0], t.fillColor [1], t.fillColor [2], t.fillColor [3]);
+    }*/
 }
 
 void generateRooms ()
@@ -95,7 +68,7 @@ void generateRooms ()
         for (uint16_t j = 0; j < w * h; j++)
         {
             Tile tile;
-            Tile_init (&tile, x + xc, y + yc, 1, BLOCK_BORDER, BLOCK_FILL);
+            Tile_init (&tile, x + xc, y + yc, 1, 1, BLOCK_FILL, BLOCK_BORDER);
 
             tiles [(x + xc - 1) + NUM_OF_TILES_PER_SIDE * (y + yc - 1)] = tile;
 
@@ -113,48 +86,51 @@ void generateRooms ()
 
 void input ()
 {
-    ALLEGRO_EVENT   event;
-    ALLEGRO_TIMEOUT timeout;
-
-    al_init_timeout (&timeout, 0.05);
-
-    bool getEvent = al_wait_for_event_until (eventQueue, &event, &timeout);
-
-    if (getEvent && event.type == ALLEGRO_EVENT_DISPLAY_CLOSE)
-        running = false;
+    SDL_Event evt;
+    while (SDL_PollEvent (&evt))
+    {
+        switch (evt.type)
+        {
+            case SDL_QUIT:
+                applicationStatus = EXIT;
+                break;
+        }
+    }    
 }
 
 void render ()
 {
-    int w = al_get_display_width (display);
+    uint8_t tw = getTileWidth (), th = getTileHeight ();
+    SDL_Rect windowBorder = { tw, th, windowWidth - tw * 2, windowHeight - th * 2 };
 
-    al_clear_to_color (al_map_rgb (0, 0, 0));
-    al_draw_filled_rectangle (0, 0, w, w, BLOCK_BORDER);
-    al_draw_filled_rectangle (getTileWidth (), getTileWidth (),
-        w - getTileWidth (), w - getTileWidth (), al_map_rgb (0, 0, 0));
+    SDL_SetRenderDrawColor (renderer, 255, 255, 255, 255);
+    SDL_RenderClear (renderer);
+
+    SDL_SetRenderDrawColor (renderer, 0, 0, 0, 255);
+    SDL_RenderFillRect (renderer, &windowBorder);
 
     for (int16_t i = 0; i < NUM_OF_TILES_PER_SIDE * NUM_OF_TILES_PER_SIDE; i++)
     {
-        Tile tile = tiles [i];
-
-        if (!tile.valid)
+        Tile t = tiles [i];
+        if (!t.valid)
             continue;
 
-        //int16_t x = tile.getX (&tile), y = tile.getY (&tile), s = tile.getSize (&tile);
-        //ALLEGRO_COLOR b = tile.getBorderColor (&tile), f = tile.getFillColor (&tile);
+        uint8_t tw = getTileWidth (), th = getTileHeight ();
+        // uint8_t *tb = t.getBorderColor (&t), *tf = t.getFillColor (&t);
+        int16_t x = t.x * tw, y = t.y * th, w = t.w * tw, h = t.h * h;
+        
+        //t.getSize (&t, &w, &h);
+        //w *= tw;
+        //h *= th;
 
-        int16_t x = tile.x, y = tile.y, s = tile.size;
-        ALLEGRO_COLOR b = tile.borderColor, f = tile.fillColor;
-
-        x *= getTileWidth ();
-        y *= getTileWidth ();
-        s *= getTileWidth ();
-
-        al_draw_filled_rectangle (x, y, x + s, y + s, f /*al_map_rgb_f (1.0f, 0.0f, 0.0f)*/);
-        al_draw_rectangle (x, y, x + s, y + s, b /*al_map_rgb (255, 255, 255)*/, 1);
+        SDL_Rect r = { x, y, tw, th };
+        SDL_SetRenderDrawColor (renderer, BLOCK_FILL [0], BLOCK_FILL [1], BLOCK_FILL [2], BLOCK_FILL [3]);
+        SDL_RenderFillRect (renderer, &r);
+        SDL_SetRenderDrawColor (renderer, BLOCK_BORDER [0], BLOCK_BORDER [1], BLOCK_BORDER [2], BLOCK_BORDER [3]);
+        SDL_RenderDrawRect (renderer, &r);
     }
 
-    al_flip_display ();
+    SDL_RenderPresent (renderer);
 }
 
 void update ()
@@ -162,7 +138,25 @@ void update ()
 
 }
 
-static uint8_t getTileWidth ()
+static uint8_t getTileHeight () { return (uint8_t) (windowHeight / NUM_OF_TILES_PER_SIDE); }
+
+static uint8_t getTileWidth () { return (uint8_t) (windowWidth / NUM_OF_TILES_PER_SIDE); }
+
+/**
+ * Attempts to inititalize required SDL objects.
+ *
+ * @return Returns the enum representing the status of the creation process
+ */
+static STATUS init ()
 {
-    return al_get_display_width (display) / NUM_OF_TILES_PER_SIDE;
+    if (SDL_Init (SDL_INIT_VIDEO))
+        return VIDEO_CREATION_FAILED;
+
+    if (SDL_CreateWindowAndRenderer (525, 525, SDL_WINDOW_RESIZABLE, &window, &renderer))
+        return WINDOW_CREATION_FAILED;
+
+    SDL_GetWindowSize (window, &windowWidth, &windowHeight);
+    generate ();
+
+    return RUNNING;
 }

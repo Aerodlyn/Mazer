@@ -1,8 +1,5 @@
 #include "Tile.h"
-
 #include <stdio.h>
-
-static int16_t getSize (Tile *tile) { return tile->size; }
 
 static int16_t getX (Tile *tile) { return tile->x; }
 
@@ -14,16 +11,24 @@ static void destroy (Tile *tile)
     tile = NULL;
 }
 
-static ALLEGRO_COLOR getBorderColor (Tile *tile) { return tile->borderColor; }
+static void getSize (Tile *tile, int16_t *w, int16_t *h)
+{
+    *w = tile->w;
+    *h = tile->h;
+}
 
-static ALLEGRO_COLOR getFillColor (Tile *tile) { return tile->fillColor; }
+static uint8_t* getBorderColor (Tile *tile) { return tile->borderColor; }
 
-void Tile_init (Tile *tile, int16_t x, int16_t y, int16_t size, ALLEGRO_COLOR border, 
-    ALLEGRO_COLOR fill)
+static uint8_t* getFillColor (Tile *tile) { return tile->fillColor; }
+
+void c_Tile_init (Tile *tile, int16_t *x, int16_t *y, int16_t *w, int16_t *h) { Tile_init (tile, *x, *y, *w, *h, NULL, NULL); }
+
+void Tile_init (Tile *tile, int16_t x, int16_t y, int16_t w, int16_t h, uint8_t *border, uint8_t *fill)
 {
     tile->x = x;
     tile->y = y;
-    tile->size = size;
+    tile->w = w;
+    tile->h = h;
     tile->borderColor = border;
     tile->fillColor = fill;
     tile->valid = true;
