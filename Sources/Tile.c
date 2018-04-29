@@ -17,20 +17,22 @@ static void getSize (Tile *tile, int16_t *w, int16_t *h)
     *h = tile->h;
 }
 
-static uint8_t* getBorderColor (Tile *tile) { return tile->borderColor; }
+static SDL_Color getBorderColor (Tile *tile) { return tile->borderColor; }
 
-static uint8_t* getFillColor (Tile *tile) { return tile->fillColor; }
+static SDL_Color getFillColor (Tile *tile) { return tile->fillColor; }
 
-void c_Tile_init (Tile *tile, int16_t *x, int16_t *y, int16_t *w, int16_t *h) { Tile_init (tile, *x, *y, *w, *h, NULL, NULL); }
-
-void Tile_init (Tile *tile, int16_t x, int16_t y, int16_t w, int16_t h, uint8_t *border, uint8_t *fill)
+void Tile_init (Tile *tile)
 {
-    tile->x = x;
-    tile->y = y;
-    tile->w = w;
-    tile->h = h;
-    tile->borderColor = border;
-    tile->fillColor = fill;
+    tile->borderColor.r = 255;
+    tile->borderColor.g = 255;
+    tile->borderColor.b = 255;
+    tile->borderColor.a = 255;
+
+    tile->fillColor.r = 255;
+    tile->fillColor.g = 0;
+    tile->fillColor.b = 0;
+    tile->fillColor.a = 0;
+
     tile->valid = true;
 
     tile->getX = &getX;

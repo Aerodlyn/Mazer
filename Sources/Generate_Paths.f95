@@ -56,7 +56,7 @@ subroutine f_generatePaths (tiles, perSide, attempts, padding) bind (C, name = "
         if (.true.) then
             t = tiles ((x + perSide * y) + 1_c_int8_t)
 
-            call c_Tile_init (t, x, y, w, h)
+            call Tile_init (t)
             !call c_mapRGB (t%fill, 0.5_c_float, 1.0_c_float, 1.0_c_float)
             !call c_mapRGB (t%border, 1.0_c_float, 1.0_c_float, 1.0_c_float)
 

@@ -1,5 +1,17 @@
 module Mazer
     use, intrinsic :: iso_c_binding
+    implicit none
+
+    integer (c_int8_t), bind (C, name = "WINDOW_PADDING") :: WINDOW_PADDING
+    integer (c_int16_t), bind (C, name = "NUM_OF_TILES_PER_SIDE") :: NUM_OF_TILES_PER_SIDE
+    integer (c_int16_t), bind (C, name = "WINDOW_HEIGHT") :: WINDOW_HEIGHT 
+    integer (c_int16_t), bind (C, name = "WINDOW_WIDTH") :: WINDOW_WIDTH
+    integer (c_int32_t), bind (C, name = "NUM_OF_TILES") :: NUM_OF_TILES
+
+    type, bind (C) :: SDL_Color 
+        character (c_char) :: r, g, b, a
+    end type
+
     type, bind (C) :: Room
         logical (c_bool) :: valid
         integer (c_int16_t) :: w, h, x, y
@@ -10,7 +22,7 @@ module Mazer
     type, bind (C) :: Tile
         logical (c_bool) :: valid
         integer (c_int16_t) :: x, y, w, h
-        integer (c_int8_t), dimension (4) :: border, fill
+        type (SDL_Color) :: border, fill
 
         type (c_funptr) :: getX, getY, destroy, getSize, getBorderColor, getFillColor
     end type
@@ -18,9 +30,10 @@ module Mazer
     interface
         subroutine c_mapRGB (rgb, r, g, b) bind (C, name = "c_mapRGB")
             use, intrinsic :: iso_c_binding
+            import
             implicit none
 
-            integer (c_int8_t), dimension (*), intent (inout) :: rgb
+            type (Tile), intent (inout) :: rgb
             real (c_float), intent (in) :: r, g, b
         end subroutine c_mapRGB
 
@@ -29,14 +42,27 @@ module Mazer
             implicit none
         end function c_rand
 
-        subroutine c_Tile_init (t, x, y, w, h) bind (C, name = "c_Tile_init")
+        subroutine Tile_init (t) bind (C, name = "Tile_init")
             use, intrinsic :: iso_c_binding
             import
             implicit none
 
             type (Tile), intent (inout) :: t
-            integer (c_int16_t), intent (in) :: x, y, w, h
-        end subroutine c_Tile_init
+        end subroutine Tile_init
     end interface
+
+    contains 
+        subroutine f_init () bind (C, name = "f_init") 
+            use, intrinsic :: iso_c_binding
+            implicit none
+
+            WINDOW_WIDTH = 550_c_int16_t
+            WINDOW_HEIGHT = WINDOW_WIDTH
+
+            NUM_OF_TILES_PER_SIDE = 50_c_int16_t
+            NUM_OF_TILES = NUM_OF_TILES_PER_SIDE ** 2
+
+            WINDOW_PADDING = 1_c_int8_t
+        end subroutine f_init
 end module Mazer
 

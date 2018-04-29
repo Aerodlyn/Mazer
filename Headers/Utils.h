@@ -4,9 +4,11 @@
 #include <stdlib.h>
 #include <stdio.h>
 
-void c_mapRGB (uint8_t *rgb, float *r, float *g, float *b);
+#include "Tile.h"
 
-void mapRGB (uint8_t *rgb, float r, float g, float b);
+void c_mapRGB (Tile *tile, float *r, float *g, float *b);
+
+void mapRGB (Tile *tile, float r, float g, float b);
 
 /**
  * Prints out the given message as an error and exits, returning the given code.

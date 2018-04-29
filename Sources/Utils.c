@@ -1,18 +1,15 @@
 #include "Utils.h"
 
-#include <stdio.h>
+void c_mapRGB (Tile *tile, float *r, float *g, float *b) { mapRGB (tile, *r, *g, *b); }
 
-void c_mapRGB (uint8_t *rgb, float *r, float *g, float *b) { mapRGB (rgb, *r, *g, *b); }
-
-void mapRGB (uint8_t *rgb, float r, float g, float b)
+void mapRGB (Tile *tile, float r, float g, float b)
 {
-    if (!rgb)
-        rgb = malloc (sizeof (uint8_t) * r);
-        
-    rgb [0] = r * 255;
-    rgb [1] = g * 255;
-    rgb [2] = b * 255;
-    rgb [3] = 255;
+    tile->fillColor.r = r * 255;
+    tile->fillColor.g = g * 255;
+    tile->fillColor.b = b * 255;
+    tile->fillColor.a = 255;
+
+    // printf ("%d, %d, %d, %d\n", tile->fillColor.r, tile->fillColor.g, tile->fillColor.b, tile->fillColor.a);
 }
 
 /**
