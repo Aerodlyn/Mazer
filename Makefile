@@ -1,5 +1,5 @@
 SOURCES := $(wildcard Sources/*.c)
-FORTRAN := Sources/Mazer_Module.f95 Sources/Generate_Rooms.f95 Sources/Generate_Paths.f95
+FORTRAN := Sources/Mazer_Module.f95 Sources/Generate_Tiles.f95 Sources/Generate_Rooms.f95 Sources/Generate_Paths.f95
 MODULES := $(wildcard *.mod Sources/*.mod)
 OBJECTS := $(SOURCES:.c=.o) $(FORTRAN:.f95=.o)
 
@@ -26,7 +26,7 @@ ALIBS := $(shell path=`echo $$PKG_CONFIG_PATH | awk -F ':' '{print $$2}'`; test 
 # ALIBS := $(shell ls /usr/lib/pkgconfig/ | grep -E $(APACKS) | awk -F '.pc' '{print $$1}')
 
 all : $(OBJECTS)
-	$(CC) -lgfortran $(CFLAGS) $(SDL_FLAGS) -o $(EXEC) $(OBJECTS)
+	$(CC) -lpthread -lgfortran $(CFLAGS) $(SDL_FLAGS) -o $(EXEC) $(OBJECTS)
 
 %.o : %.c
 	$(CC) -c $(CFLAGS) $(SDL_FLAGS) -o $@ $<

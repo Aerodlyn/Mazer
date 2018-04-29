@@ -3,37 +3,47 @@
 
 #include <SDL2/SDL.h>
 
+#include <pthread.h>
 #include <stdbool.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <time.h>
-
-#define nullptr NULL
+#include <unistd.h>
 
 #include "Room.h"
 #include "Tile.h"
 #include "Utils.h"
 // #include "_Vector.h"
 
+#define nullptr NULL
+
+extern const int8_t     WINDOW_PADDING;
+extern const int16_t    NUM_OF_TILES_PER_SIDE, WINDOW_HEIGHT, WINDOW_WIDTH;
+extern const int32_t    NUM_OF_TILES;
+
 extern void f_generatePaths (Tile*, const int16_t*, const int16_t*, const int8_t*);
-extern void f_generateRooms (Room*, const int16_t*, const int16_t*, const int16_t*, const int8_t*);
+extern void f_generateTiles (Tile*, const int16_t*, const int16_t*, const int16_t*, const int16_t*, const int16_t*);
+extern void f_generateRooms (Tile*, const int32_t*, const int16_t*, const int16_t*);
+extern void f_init ();
 
 typedef enum _STATUS
 {
     SURFACE_CREATION_FAILED,
+    TILE_CREATION_FAILED,
+    THREAD_CREATION_FAILED,
     VIDEO_CREATION_FAILED,
     WINDOW_CREATION_FAILED,
     RUNNING,
     EXIT
 } STATUS;
 
-static const int8_t     WINDOW_PADDING          = 1;
-static const int16_t    MIN_ROOM_WIDTH_HEIGHT   = 5, ROOM_ATTEMPTS = 1000, NUM_OF_TILES_PER_SIDE = 75;
+static const int16_t    MIN_ROOM_WIDTH_HEIGHT   = 5, ROOM_ATTEMPTS = 1000;
 
 static const uint8_t BLOCK_BORDER []    = { 255, 255, 255, 255 };
 static const uint8_t BLOCK_FILL []      = { 255, 0, 0, 255 };
 
-static int32_t windowWidth, windowHeight;
+static pthread_t        gameloopThread;
+static pthread_attr_t   gameloopAttr;
 
 static SDL_Renderer *renderer   = nullptr;
 static SDL_Window   *window     = nullptr;
@@ -48,13 +58,13 @@ static void destroy ();
 
 static void generate ();
 
-static void generateRooms ();
-
 static void input ();
 
 static void render ();
 
 static void update ();
+
+static void* gameloop ();
 
 static uint8_t getTileHeight ();
 

@@ -3,11 +3,8 @@
 int main (int argc, char **argv)
 {
     applicationStatus = init ();
-    while (applicationStatus == RUNNING) 
-    {
+    while (applicationStatus == RUNNING)
         input ();
-        render ();
-    }
 
     destroy ();
     return applicationStatus;
@@ -30,58 +27,9 @@ void destroy ()
 void generate ()
 {
     srand (time (NULL));
+    f_generateRooms (tiles, &NUM_OF_TILES, &ROOM_ATTEMPTS, &MIN_ROOM_WIDTH_HEIGHT);
 
-    tiles = calloc (NUM_OF_TILES_PER_SIDE * NUM_OF_TILES_PER_SIDE, sizeof (Tile));
-    int16_t tileAttempts = ROOM_ATTEMPTS;
-
-    generateRooms ();
-    f_generatePaths (tiles, &NUM_OF_TILES_PER_SIDE, &tileAttempts, &WINDOW_PADDING);
-
-    /*for (int16_t i = 0; i < NUM_OF_TILES_PER_SIDE * NUM_OF_TILES_PER_SIDE; i++)
-    {
-        Tile t = tiles [i];
-
-        if (!t.valid)
-            continue;
-
-        if (t.fillColor [0] != 255)
-            printf ("%d, %d, %d, %d\n", t.fillColor [0], t.fillColor [1], t.fillColor [2], t.fillColor [3]);
-    }*/
-}
-
-void generateRooms ()
-{
-    Room *rooms = calloc (ROOM_ATTEMPTS, sizeof (Room));
-    f_generateRooms (rooms, &ROOM_ATTEMPTS, &MIN_ROOM_WIDTH_HEIGHT, &NUM_OF_TILES_PER_SIDE, 
-        &WINDOW_PADDING);
-    
-    for (int i = 0; i < ROOM_ATTEMPTS; i++)
-    {
-        int x = rooms [i].x, y = rooms [i].y;
-        int w = rooms [i].w, h = rooms [i].h;
-
-        // Don't add room if it overlaps another
-        if (!rooms [i].valid)
-            continue;
-
-        uint16_t xc = 0, yc = 0;
-        for (uint16_t j = 0; j < w * h; j++)
-        {
-            Tile tile;
-            Tile_init (&tile, x + xc, y + yc, 1, 1, BLOCK_FILL, BLOCK_BORDER);
-
-            tiles [(x + xc - 1) + NUM_OF_TILES_PER_SIDE * (y + yc - 1)] = tile;
-
-            xc++;
-            if (xc >= w)
-            {
-                xc = 0;
-                yc++;
-            }
-        }
-    }
-
-    free (rooms);
+    // f_generatePaths (tiles, &NUM_OF_TILES_PER_SIDE, &tileAttempts, &WINDOW_PADDING);
 }
 
 void input ()
@@ -95,38 +43,30 @@ void input ()
                 applicationStatus = EXIT;
                 break;
         }
-    }    
+    }
 }
 
 void render ()
 {
     uint8_t tw = getTileWidth (), th = getTileHeight ();
-    SDL_Rect windowBorder = { tw, th, windowWidth - tw * 2, windowHeight - th * 2 };
-
-    SDL_SetRenderDrawColor (renderer, 255, 255, 255, 255);
-    SDL_RenderClear (renderer);
 
     SDL_SetRenderDrawColor (renderer, 0, 0, 0, 255);
-    SDL_RenderFillRect (renderer, &windowBorder);
+    SDL_RenderClear (renderer);
 
-    for (int16_t i = 0; i < NUM_OF_TILES_PER_SIDE * NUM_OF_TILES_PER_SIDE; i++)
+    for (int16_t i = 0; i < NUM_OF_TILES; i++)
     {
         Tile t = tiles [i];
         if (!t.valid)
             continue;
 
-        uint8_t tw = getTileWidth (), th = getTileHeight ();
-        // uint8_t *tb = t.getBorderColor (&t), *tf = t.getFillColor (&t);
-        int16_t x = t.x * tw, y = t.y * th, w = t.w * tw, h = t.h * h;
-        
-        //t.getSize (&t, &w, &h);
-        //w *= tw;
-        //h *= th;
+        int16_t tx = (i % NUM_OF_TILES_PER_SIDE) * tw, 
+            ty = ((i / NUM_OF_TILES_PER_SIDE)) * th;
+        SDL_Color tb = t.getBorderColor (&t), tf = t.getFillColor (&t);
 
-        SDL_Rect r = { x, y, tw, th };
-        SDL_SetRenderDrawColor (renderer, BLOCK_FILL [0], BLOCK_FILL [1], BLOCK_FILL [2], BLOCK_FILL [3]);
+        SDL_Rect r = { tx, ty, tw, th };
+        SDL_SetRenderDrawColor (renderer, tf.r, tf.g, tf.b, tf.a);
         SDL_RenderFillRect (renderer, &r);
-        SDL_SetRenderDrawColor (renderer, BLOCK_BORDER [0], BLOCK_BORDER [1], BLOCK_BORDER [2], BLOCK_BORDER [3]);
+        SDL_SetRenderDrawColor (renderer, tb.r, tb.g, tb.b, tb.a);
         SDL_RenderDrawRect (renderer, &r);
     }
 
@@ -138,9 +78,23 @@ void update ()
 
 }
 
-static uint8_t getTileHeight () { return (uint8_t) (windowHeight / NUM_OF_TILES_PER_SIDE); }
+void* gameloop () 
+{
+    while (applicationStatus == RUNNING)
+    {
+        update ();
+        render ();
 
-static uint8_t getTileWidth () { return (uint8_t) (windowWidth / NUM_OF_TILES_PER_SIDE); }
+        usleep (5000000);
+        printf ("Updating...\n");
+    }
+
+    pthread_exit (NULL);
+}
+
+static uint8_t getTileHeight () { return (uint8_t) (WINDOW_HEIGHT / NUM_OF_TILES_PER_SIDE); }
+
+static uint8_t getTileWidth () { return (uint8_t) (WINDOW_WIDTH / NUM_OF_TILES_PER_SIDE); }
 
 /**
  * Attempts to inititalize required SDL objects.
@@ -148,15 +102,28 @@ static uint8_t getTileWidth () { return (uint8_t) (windowWidth / NUM_OF_TILES_PE
  * @return Returns the enum representing the status of the creation process
  */
 static STATUS init ()
-{
+{  
+    f_init ();
+
     if (SDL_Init (SDL_INIT_VIDEO))
         return VIDEO_CREATION_FAILED;
 
-    if (SDL_CreateWindowAndRenderer (525, 525, SDL_WINDOW_RESIZABLE, &window, &renderer))
+    if (SDL_CreateWindowAndRenderer (WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE, &window, &renderer))
         return WINDOW_CREATION_FAILED;
 
-    SDL_GetWindowSize (window, &windowWidth, &windowHeight);
+    tiles = calloc (NUM_OF_TILES, sizeof (Tile));
+    if (!tiles)
+        return TILE_CREATION_FAILED;
+
     generate ();
+
+    pthread_attr_init (&gameloopAttr);
+    pthread_attr_setdetachstate (&gameloopAttr, PTHREAD_CREATE_DETACHED);
+    
+    if (pthread_create (&gameloopThread, &gameloopAttr, gameloop, NULL))
+        return THREAD_CREATION_FAILED;
+
+    pthread_attr_destroy (&gameloopAttr);
 
     return RUNNING;
 }
