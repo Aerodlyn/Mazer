@@ -85,8 +85,7 @@ void* gameloop ()
         update ();
         render ();
 
-        usleep (5000000);
-        printf ("Updating...\n");
+        usleep (TARGET_FRAME_RATE);
     }
 
     pthread_exit (NULL);

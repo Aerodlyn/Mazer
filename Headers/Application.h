@@ -1,8 +1,6 @@
 #ifndef MAZER_APPLICATION_H
 #define MAZER_APPLICATION_H
 
-#include <SDL2/SDL.h>
-
 #include <pthread.h>
 #include <stdbool.h>
 #include <stdint.h>
@@ -10,12 +8,12 @@
 #include <time.h>
 #include <unistd.h>
 
+// https://wiki.libsdl.org/FrontPage
+#include <SDL2/SDL.h>
+
 #include "Room.h"
 #include "Tile.h"
 #include "Utils.h"
-// #include "_Vector.h"
-
-#define nullptr NULL
 
 extern const int8_t     WINDOW_PADDING;
 extern const int16_t    NUM_OF_TILES_PER_SIDE, WINDOW_HEIGHT, WINDOW_WIDTH;
@@ -28,7 +26,6 @@ extern void f_init ();
 
 typedef enum _STATUS
 {
-    SURFACE_CREATION_FAILED,
     TILE_CREATION_FAILED,
     THREAD_CREATION_FAILED,
     VIDEO_CREATION_FAILED,
@@ -37,6 +34,7 @@ typedef enum _STATUS
     EXIT
 } STATUS;
 
+static const int16_t    TARGET_FRAME_RATE       = 16700;
 static const int16_t    MIN_ROOM_WIDTH_HEIGHT   = 5, ROOM_ATTEMPTS = 1000;
 
 static const uint8_t BLOCK_BORDER []    = { 255, 255, 255, 255 };
@@ -45,12 +43,12 @@ static const uint8_t BLOCK_FILL []      = { 255, 0, 0, 255 };
 static pthread_t        gameloopThread;
 static pthread_attr_t   gameloopAttr;
 
-static SDL_Renderer *renderer   = nullptr;
-static SDL_Window   *window     = nullptr;
+static SDL_Renderer *renderer   = NULL;
+static SDL_Window   *window     = NULL;
 
 static STATUS applicationStatus;
 
-static Tile *tiles = nullptr;
+static Tile *tiles = NULL;
 
 int main (int argc, char **argv);
 
