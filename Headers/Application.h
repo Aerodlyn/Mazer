@@ -18,7 +18,7 @@ extern const int8_t     WINDOW_PADDING;
 extern const int16_t    NUM_OF_TILES_PER_SIDE, WINDOW_HEIGHT, WINDOW_WIDTH;
 extern const int32_t    NUM_OF_TILES;
 
-extern void f_generatePaths (Tile*, const int16_t*, const int16_t*, const int8_t*);
+extern void f_generatePaths (Tile*, const int32_t*, const int16_t*);
 extern void f_generateTiles (Tile*, const int16_t*, const int16_t*, const int16_t*, const int16_t*, const int16_t*);
 extern void f_generateRooms (Tile*, const int32_t*, const int16_t*, const int16_t*);
 extern void f_init ();
@@ -35,7 +35,7 @@ typedef enum _STATUS
 } STATUS;
 
 static const int16_t    TARGET_FRAME_RATE       = 16700;
-static const int16_t    MIN_ROOM_WIDTH_HEIGHT   = 5, ROOM_ATTEMPTS = 1000;
+static const int16_t    MIN_ROOM_WIDTH_HEIGHT   = 5, PATH_ATTEMPTS = 250, ROOM_ATTEMPTS = 1000;
 
 static const uint8_t BLOCK_BORDER []    = { 255, 255, 255, 255 };
 static const uint8_t BLOCK_FILL []      = { 255, 0, 0, 255 };

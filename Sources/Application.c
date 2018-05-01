@@ -38,8 +38,7 @@ void generate ()
 {
     srand (time (NULL));
     f_generateRooms (tiles, &NUM_OF_TILES, &ROOM_ATTEMPTS, &MIN_ROOM_WIDTH_HEIGHT);
-
-    // f_generatePaths (tiles, &NUM_OF_TILES_PER_SIDE, &tileAttempts, &WINDOW_PADDING);
+    f_generatePaths (tiles, &NUM_OF_TILES, &PATH_ATTEMPTS);
 }
 
 void input ()
@@ -70,7 +69,7 @@ void render ()
             continue;
 
         int16_t tx = (i % NUM_OF_TILES_PER_SIDE) * tw, 
-            ty = ((i / NUM_OF_TILES_PER_SIDE)) * th;
+            ty = (i / NUM_OF_TILES_PER_SIDE) * th;
         SDL_Color tb = t.getBorderColor (&t), tf = t.getFillColor (&t);
 
         SDL_Rect r = { tx, ty, tw, th };
