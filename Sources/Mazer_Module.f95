@@ -12,19 +12,15 @@ module Mazer
         character (c_char) :: r, g, b, a
     end type
 
-    type, bind (C) :: Room
-        logical (c_bool) :: valid
+    type :: Room
         integer (c_int16_t) :: w, h, x, y
-
-        type (c_funptr) :: intersects
     end type
 
     type, bind (C) :: Tile
         logical (c_bool) :: valid
-        integer (c_int16_t) :: x, y, w, h
         type (SDL_Color) :: border, fill
 
-        type (c_funptr) :: getX, getY, destroy, getSize, getBorderColor, getFillColor
+        type (c_funptr) :: getBorderColor, getFillColor
     end type
     
     interface
