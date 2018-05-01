@@ -11,7 +11,6 @@
 // https://wiki.libsdl.org/FrontPage
 #include <SDL2/SDL.h>
 
-#include "Room.h"
 #include "Tile.h"
 #include "Utils.h"
 
@@ -31,6 +30,7 @@ typedef enum _STATUS
     VIDEO_CREATION_FAILED,
     WINDOW_CREATION_FAILED,
     RUNNING,
+    STARTING,
     EXIT
 } STATUS;
 
@@ -42,11 +42,13 @@ static const uint8_t BLOCK_FILL []      = { 255, 0, 0, 255 };
 
 static pthread_t        gameloopThread;
 static pthread_attr_t   gameloopAttr;
+static pthread_cond_t   gameloopCond;
+static pthread_mutex_t  applicationStatusMutex;
 
 static SDL_Renderer *renderer   = NULL;
 static SDL_Window   *window     = NULL;
 
-static STATUS applicationStatus;
+static STATUS applicationStatus = STARTING;
 
 static Tile *tiles = NULL;
 

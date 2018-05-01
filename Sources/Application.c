@@ -2,7 +2,14 @@
 
 int main (int argc, char **argv)
 {
+    pthread_mutex_init (&applicationStatusMutex, NULL);
+    pthread_cond_init (&gameloopCond, NULL);
+
+    pthread_mutex_lock (&applicationStatusMutex);
     applicationStatus = init ();
+    pthread_cond_signal (&gameloopCond);
+    pthread_mutex_unlock (&applicationStatusMutex);
+    
     while (applicationStatus == RUNNING)
         input ();
 
@@ -22,6 +29,9 @@ void destroy ()
 
     if (tiles)
         free (tiles);
+
+    pthread_cond_destroy (&gameloopCond);
+    pthread_mutex_destroy (&applicationStatusMutex);
 }
 
 void generate ()
@@ -80,6 +90,12 @@ void update ()
 
 void* gameloop () 
 {
+    pthread_mutex_lock (&applicationStatusMutex);
+    while (applicationStatus != RUNNING)
+        pthread_cond_wait (&gameloopCond, &applicationStatusMutex);
+
+    pthread_mutex_unlock (&applicationStatusMutex);
+
     while (applicationStatus == RUNNING)
     {
         update ();
@@ -109,6 +125,8 @@ static STATUS init ()
 
     if (SDL_CreateWindowAndRenderer (WINDOW_WIDTH, WINDOW_HEIGHT, SDL_WINDOW_RESIZABLE, &window, &renderer))
         return WINDOW_CREATION_FAILED;
+
+    SDL_SetWindowResizable (window, SDL_FALSE);
 
     tiles = calloc (NUM_OF_TILES, sizeof (Tile));
     if (!tiles)
