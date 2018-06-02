@@ -77,7 +77,7 @@ void render ()
     SDL_SetRenderDrawColor (renderer, 0, 0, 0, 255);
     SDL_RenderClear (renderer);
     
-    for (int16_t i = 0; i < NUM_OF_TILES; i++)
+    for (int32_t i = 0; i < NUM_OF_TILES; i++)
     {
         Tile t = tiles [i];
         if (!t.valid)
@@ -88,22 +88,23 @@ void render ()
         uint8_t borders = Tile_getTileBorders (&t);
         SDL_Color tb = t.getBorderColor (&t), tf = t.getFillColor (&t);
 
-        SDL_Rect r = { tx, ty, tw, th };
+        SDL_Rect r = { tx, ty, tw - (i % NUM_OF_TILES_PER_SIDE == NUM_OF_TILES_PER_SIDE - 1 ? 1 : 0), 
+                        th - (i / NUM_OF_TILES_PER_SIDE == NUM_OF_TILES_PER_SIDE - 1 ? 1 : 0) };
         SDL_SetRenderDrawColor (renderer, tf.r, tf.g, tf.b, tf.a);
         SDL_RenderFillRect (renderer, &r);
         
         SDL_SetRenderDrawColor (renderer, tb.r, tb.g, tb.b, tb.a);
         if (borders & BOTTOM)
-            SDL_RenderDrawLine (renderer, tx, ty + th, tx + tw, ty + th);
+            SDL_RenderDrawLine (renderer, r.x, r.y + r.h, r.x + r.w, r.y + r.h);
 
         if (borders & LEFT)
-            SDL_RenderDrawLine (renderer, tx, ty, tx, ty + th);
+            SDL_RenderDrawLine (renderer, r.x, r.y, r.x, r.y + r.h);
 
         if (borders & RIGHT)
-            SDL_RenderDrawLine (renderer, tx + tw, ty, tx + tw, ty + th);
+            SDL_RenderDrawLine (renderer, r.x + r.w, r.y, r.x + r.w, r.y + r.h);
 
         if (borders & TOP)
-            SDL_RenderDrawLine (renderer, tx, ty, tx + tw, ty);
+            SDL_RenderDrawLine (renderer, r.x, r.y, r.x + r.w, r.y);
     }
 
     SDL_RenderPresent (renderer);
@@ -118,7 +119,7 @@ static uint8_t getTileHeight () { return (uint8_t) (WINDOW_HEIGHT / NUM_OF_TILES
 
 static uint8_t getTileWidth () { return (uint8_t) (WINDOW_WIDTH / NUM_OF_TILES_PER_SIDE); }
 
-static STATUS generate ()
+static Status generate ()
 {
     clearTiles ();
 
@@ -135,7 +136,7 @@ static STATUS generate ()
  *
  * @return Returns the enum representing the status of the creation process
  */
-static STATUS init ()
+static Status init ()
 {  
     f_init ();
 
