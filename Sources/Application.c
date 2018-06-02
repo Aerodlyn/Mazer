@@ -1,5 +1,13 @@
 #include "Application.h"
 
+/**
+ * Handles the core functionality of Mazer; rendering and updating based on user input. All generation code is handled by 
+ *  Fortran procedures which are called by the generate method defined in this file.
+ * 
+ * @author  Patrick Jahnig (Aerodlyn)
+ * @version 2018.06.02
+ */
+
 int main (int argc, char **argv)
 {
     applicationStatus = init ();    
@@ -14,12 +22,9 @@ int main (int argc, char **argv)
     return applicationStatus;
 }
 
-static void clearTiles ()
-{
-    for (int32_t i = 0; i < NUM_OF_TILES; i++)
-        tiles [i].valid = false;
-}
-
+/**
+ * Destoys all dynamically allocated values. 
+ */
 void destroy ()
 {
     if (renderer)
@@ -34,6 +39,9 @@ void destroy ()
     SDL_Quit ();
 }
 
+/**
+ * Handles input from the user (keyboard only).
+ */
 void input ()
 {
     SDL_Event evt;
@@ -70,6 +78,9 @@ void input ()
     }
 }
 
+/**
+ * Renders all valid tiles to the screen. Invalid tiles are rendered as black space (the background).
+ */
 void render ()
 {
     uint8_t tw = getTileWidth (), th = getTileHeight ();
@@ -110,15 +121,29 @@ void render ()
     SDL_RenderPresent (renderer);
 }
 
-void update ()
-{
+/**
+ * Updates game conditions based on user input.
+ * NOTE: Unused at the moment.
+ */
+void update () {}
 
-}
-
+/**
+ * Returns the height of each tile.
+ * 
+ * @return The height of each tile
+ */
 static uint8_t getTileHeight () { return (uint8_t) (WINDOW_HEIGHT / NUM_OF_TILES_PER_SIDE); }
 
+/**
+ * Returns the width of each tile.
+ * 
+ * @return The width of each tile
+ */
 static uint8_t getTileWidth () { return (uint8_t) (WINDOW_WIDTH / NUM_OF_TILES_PER_SIDE); }
 
+/**
+ * Calls generation functions (typed in Fortran).
+ */
 static Status generate ()
 {
     clearTiles ();
