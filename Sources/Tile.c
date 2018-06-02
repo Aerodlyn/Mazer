@@ -22,3 +22,7 @@ void Tile_init (Tile *tile)
     tile->getBorderColor = &getBorderColor;
     tile->getFillColor = &getFillColor;
 }
+
+void Tile_setBorders (Tile * const tile, const Tile_Borders borders) { tile->borders = borders; }
+
+uint8_t Tile_getTileBorders (const Tile * const tile) { return tile->borders; }

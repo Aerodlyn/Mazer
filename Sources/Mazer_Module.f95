@@ -8,6 +8,10 @@ module Mazer
     integer (c_int16_t), bind (C, name = "WINDOW_WIDTH") :: WINDOW_WIDTH
     integer (c_int32_t), bind (C, name = "NUM_OF_TILES") :: NUM_OF_TILES
 
+    enum, bind (C)
+        enumerator :: BOTTOM = 1, LEFT = 2, RIGHT = 4, TOP = 8
+    end enum
+
     type, bind (C) :: SDL_Color 
         character (c_char) :: r, g, b, a
     end type
@@ -18,6 +22,7 @@ module Mazer
 
     type, bind (C) :: Tile
         logical (c_bool) :: valid
+        integer (c_int8_t) :: borders;
         type (SDL_Color) :: border, fill
 
         type (c_funptr) :: getBorderColor, getFillColor

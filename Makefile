@@ -1,5 +1,6 @@
 SOURCES := $(wildcard Sources/*.c)
-FORTRAN := Sources/Mazer_Module.f95 Sources/Generate_Tiles.f95 Sources/Generate_Rooms.f95 Sources/Generate_Paths.f95
+FORTRAN := Sources/Mazer_Module.f95 Sources/Determine_Borders.f95 Sources/Generate_Tiles.f95 Sources/Generate_Rooms.f95 \
+			Sources/Generate_Paths.f95
 MODULES := $(wildcard *.mod Sources/*.mod)
 OBJECTS := $(SOURCES:.c=.o) $(FORTRAN:.f95=.o)
 

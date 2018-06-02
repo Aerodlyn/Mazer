@@ -10,7 +10,6 @@ module Generate_Tiles
             type (Tile), dimension (0 : length - 1), intent (inout) :: tiles
 
             integer :: i, j
-            type (Tile) :: t
             do i = 0, w - 1
                 do j = 0, h - 1 
                     call Tile_init (tiles ((x + i) + NUM_OF_TILES_PER_SIDE * (y + j)))

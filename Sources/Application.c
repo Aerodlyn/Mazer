@@ -2,19 +2,22 @@
 
 int main (int argc, char **argv)
 {
-    pthread_mutex_init (&applicationStatusMutex, NULL);
-    pthread_cond_init (&gameloopCond, NULL);
-
-    pthread_mutex_lock (&applicationStatusMutex);
-    applicationStatus = init ();
-    pthread_cond_signal (&gameloopCond);
-    pthread_mutex_unlock (&applicationStatusMutex);
-    
+    applicationStatus = init ();    
     while (applicationStatus == RUNNING)
+    {
         input ();
+        update ();
+        render ();
+    }
 
     destroy ();
     return applicationStatus;
+}
+
+static void clearTiles ()
+{
+    for (int32_t i = 0; i < NUM_OF_TILES; i++)
+        tiles [i].valid = false;
 }
 
 void destroy ()
@@ -25,20 +28,10 @@ void destroy ()
     if (window)
         SDL_DestroyWindow (window);
 
-    SDL_Quit ();
-
     if (tiles)
         free (tiles);
 
-    pthread_cond_destroy (&gameloopCond);
-    pthread_mutex_destroy (&applicationStatusMutex);
-}
-
-void generate ()
-{
-    srand (time (NULL));
-    f_generateRooms (tiles, &NUM_OF_TILES, &ROOM_ATTEMPTS, &MIN_ROOM_WIDTH_HEIGHT);
-    f_generatePaths (tiles, &NUM_OF_TILES, &PATH_ATTEMPTS);
+    SDL_Quit ();
 }
 
 void input ()
@@ -48,6 +41,28 @@ void input ()
     {
         switch (evt.type)
         {
+            case SDL_KEYDOWN:
+                if (isKeyDown)
+                    break;
+
+                switch (evt.key.keysym.sym)
+                {
+                    case SDLK_g:                        
+                        // applicationStatus = generate ();
+                        break; 
+
+                    case SDLK_q:
+                        applicationStatus = EXIT;
+                        break;
+                }
+
+                isKeyDown = true;
+                break;
+
+            case SDL_KEYUP:
+                isKeyDown = false;
+                break;
+
             case SDL_QUIT:
                 applicationStatus = EXIT;
                 break;
@@ -61,7 +76,7 @@ void render ()
 
     SDL_SetRenderDrawColor (renderer, 0, 0, 0, 255);
     SDL_RenderClear (renderer);
-
+    
     for (int16_t i = 0; i < NUM_OF_TILES; i++)
     {
         Tile t = tiles [i];
@@ -70,13 +85,25 @@ void render ()
 
         int16_t tx = (i % NUM_OF_TILES_PER_SIDE) * tw, 
             ty = (i / NUM_OF_TILES_PER_SIDE) * th;
+        uint8_t borders = Tile_getTileBorders (&t);
         SDL_Color tb = t.getBorderColor (&t), tf = t.getFillColor (&t);
 
         SDL_Rect r = { tx, ty, tw, th };
         SDL_SetRenderDrawColor (renderer, tf.r, tf.g, tf.b, tf.a);
         SDL_RenderFillRect (renderer, &r);
+        
         SDL_SetRenderDrawColor (renderer, tb.r, tb.g, tb.b, tb.a);
-        SDL_RenderDrawRect (renderer, &r);
+        if (borders & BOTTOM)
+            SDL_RenderDrawLine (renderer, tx, ty + th, tx + tw, ty + th);
+
+        if (borders & LEFT)
+            SDL_RenderDrawLine (renderer, tx, ty, tx, ty + th);
+
+        if (borders & RIGHT)
+            SDL_RenderDrawLine (renderer, tx + tw, ty, tx + tw, ty + th);
+
+        if (borders & TOP)
+            SDL_RenderDrawLine (renderer, tx, ty, tx + tw, ty);
     }
 
     SDL_RenderPresent (renderer);
@@ -87,28 +114,21 @@ void update ()
 
 }
 
-void* gameloop () 
-{
-    pthread_mutex_lock (&applicationStatusMutex);
-    while (applicationStatus != RUNNING)
-        pthread_cond_wait (&gameloopCond, &applicationStatusMutex);
-
-    pthread_mutex_unlock (&applicationStatusMutex);
-
-    while (applicationStatus == RUNNING)
-    {
-        update ();
-        render ();
-
-        usleep (TARGET_FRAME_RATE);
-    }
-
-    pthread_exit (NULL);
-}
-
 static uint8_t getTileHeight () { return (uint8_t) (WINDOW_HEIGHT / NUM_OF_TILES_PER_SIDE); }
 
 static uint8_t getTileWidth () { return (uint8_t) (WINDOW_WIDTH / NUM_OF_TILES_PER_SIDE); }
+
+static STATUS generate ()
+{
+    clearTiles ();
+
+    srand (time (NULL));
+    f_generateRooms (tiles, &NUM_OF_TILES, &ROOM_ATTEMPTS, &MIN_ROOM_WIDTH_HEIGHT);
+    f_generatePaths (tiles, &NUM_OF_TILES, &PATH_ATTEMPTS);
+    f_determineBorders (tiles, &NUM_OF_TILES);
+
+    return RUNNING;
+}
 
 /**
  * Attempts to inititalize required SDL objects.
@@ -131,15 +151,5 @@ static STATUS init ()
     if (!tiles)
         return TILE_CREATION_FAILED;
 
-    generate ();
-
-    pthread_attr_init (&gameloopAttr);
-    pthread_attr_setdetachstate (&gameloopAttr, PTHREAD_CREATE_DETACHED);
-    
-    if (pthread_create (&gameloopThread, &gameloopAttr, gameloop, NULL))
-        return THREAD_CREATION_FAILED;
-
-    pthread_attr_destroy (&gameloopAttr);
-
-    return RUNNING;
+    return generate ();
 }
