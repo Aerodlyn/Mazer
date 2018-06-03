@@ -1,5 +1,33 @@
 #include "Application.h"
 
+#ifdef DEBUG
+    #define DEBUG_COUNT_VALID_TILES(tiles, length)  \
+    {                                               \
+        int count = 0;                              \
+        for (int i = 0; i < length; i++)            \
+        {                                           \
+            if (tiles [i].valid)                    \
+                count++;                            \
+        }                                           \
+                                                    \
+        count;                                      \
+    }
+    #define DEBUG_PRINT(fmt, args...)   \
+    {                                   \
+        fprintf (stderr, fmt, ##args);  \
+        fprintf (stderr, "\n");         \
+    }
+    #define DEBUG_VARIABLE(type, variable)              \
+    {                                                   \
+        char buffer [256];                              \
+        sprintf (buffer, type, variable);               \
+        DEBUG_PRINT ("\t%s = %s", #variable, buffer);   \
+    }
+#else
+    #define DEBUG_PRINT(fmt, args...)
+    #define DEBUG_VARIABLE(type, variable)
+#endif
+
 /**
  * Handles the core functionality of Mazer; rendering and updating based on user input. All generation code is handled by 
  *  Fortran procedures which are called by the generate method defined in this file.
@@ -146,12 +174,13 @@ static uint8_t getTileWidth () { return (uint8_t) (WINDOW_WIDTH / NUM_OF_TILES_P
  */
 static Status generate ()
 {
-    clearTiles ();
-
     srand (time (NULL));
     f_generateRooms (tiles, &NUM_OF_TILES, &ROOM_ATTEMPTS, &MIN_ROOM_WIDTH_HEIGHT);
     f_generatePaths (tiles, &NUM_OF_TILES, &PATH_ATTEMPTS);
     f_determineBorders (tiles, &NUM_OF_TILES);
+
+    DEBUG_PRINT ("Generated %d valid tiles", (DEBUG_COUNT_VALID_TILES (tiles, NUM_OF_TILES)));
+    DEBUG_PRINT ("Mazer is finished initializing");
 
     return RUNNING;
 }
@@ -163,7 +192,15 @@ static Status generate ()
  */
 static Status init ()
 {  
+    DEBUG_PRINT ("Initializing Fortran constants...");
     f_init ();
+
+    DEBUG_PRINT ("Initialized Fortran constants:");
+    DEBUG_VARIABLE ("%d", WINDOW_PADDING);
+    DEBUG_VARIABLE ("%d", WINDOW_WIDTH);
+    DEBUG_VARIABLE ("%d", WINDOW_HEIGHT);
+    DEBUG_VARIABLE ("%d", NUM_OF_TILES_PER_SIDE);
+    DEBUG_VARIABLE ("%d", NUM_OF_TILES);
 
     if (SDL_Init (SDL_INIT_VIDEO))
         return VIDEO_CREATION_FAILED;
@@ -176,6 +213,7 @@ static Status init ()
     tiles = calloc (NUM_OF_TILES, sizeof (Tile));
     if (!tiles)
         return TILE_CREATION_FAILED;
+    DEBUG_PRINT ("Initialized Tile array, size: %lu bytes", sizeof (tiles) * NUM_OF_TILES);
 
     return generate ();
 }
