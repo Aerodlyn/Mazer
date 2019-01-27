@@ -1,4 +1,4 @@
-# Mazer - An attempt at Maze (Dungeon-esqe) Generation
+# Mazer - An attempt at Maze (Dungeon-esque) Generation
 <p align="center"><img src="Mazer.png" height="600"></p>
 
 Mazer is a relatively simple game that generates a random imperfect maze, stylized in the idea of exploring a dungeon in a retro RPG. The game uses C and SDL for the majority of its logic and entirely for graphics. However, I wanted to implement some logic in another language. Initially I thought about using Assembly (NASM) but I quickly decided that would be more trouble than it would be worth. So, I decided I would either use Fortran or Lua. I chose Fortran as I was more curious about working with it then Lua, given that I have some previous experience with Lua.
